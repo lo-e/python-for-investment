@@ -24,10 +24,22 @@ market = 'HK'
 trade_env = 1
 
 '''
-实例化行情上下文对象
+行情上下文
 '''
+#实例化行情上下文对象
 quote_ctx = ft.OpenQuoteContext(host = api_svr_ip, port = api_svr_port)
-quote_ctx.subscribe(code, 'ORDER_BOOK', push = False)
+
+#订阅高频数据查询
+#quote_ctx.subscribe(code, 'ORDER_BOOK', push = False) #摆盘
+#quote_ctx.subscribe(code, 'QUOTE', push = False) #报价
+#quote_ctx.subscribe(code, 'TICKER', push = False) #逐笔
+#quote_ctx.subscribe(code, 'K_DAY', push = False) #日K
+#quote_ctx.subscribe(code, 'RT_DATA', push = False) #分时
+quote_ctx.subscribe(code, 'BROKER', push = False) #经济队列
+
+#查看当前订阅
+ret_code, ret_data = quote_ctx.query_subscription(0)
+print ret_data
 
 '''
 #上下文控制
@@ -74,9 +86,11 @@ quote_ctx.set_handler('')
 
 #获取逐笔
 #ret, rt_ticker = quote_ctx.get_rt_ticker(code, 10)
+#print rt_ticker
 
 #获取当前k线
 #ret, cur_kline = quote_ctx.get_cur_kline(code, 100, 'K_DAY', 'qfq')
+#print cur_kline
 
 #获取摆盘
 #ret, order_book = quote_ctx.get_order_book(code)
@@ -84,14 +98,16 @@ quote_ctx.set_handler('')
 
 #获取分时数据
 #ret, rt_data = quote_ctx.get_rt_data(code)
+#print rt_data
 
 #获取经济队列
 #ret, broker_queue, _ = quote_ctx.get_broker_queue(code)
+#print broker_queue
 
 '''
 #实例化港股交易上下文对象
 '''
-trader_hk_ctx = ft.OpenHKTradeContext(host = api_svr_ip, port = api_svr_port)
+#trader_hk_ctx = ft.OpenHKTradeContext(host = api_svr_ip, port = api_svr_port)
 
 '''
 #实例化美股交易上下文对象
