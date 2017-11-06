@@ -1,6 +1,9 @@
 # -- coding: utf8 --
 
 import exercise49
+import sys
+import os
+import test1
 
 class Cat(object):
 	"""docstring for Cat"""
