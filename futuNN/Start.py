@@ -1,24 +1,30 @@
 # -*- coding: utf-8 -*-
 
 import futuquant as ft
+from QuoteHandler import *
 import time
-import datetime
 
+'''
+定义变量
+'''
 #服务器ip
-api_svr_ip = '119.29.141.202'
-#api_svr_ip = '127.0.0.1'
+#api_svr_ip = '119.29.141.202'
+api_svr_ip = '127.0.0.1'
 
 #服务器端口
 api_svr_port = 11111
 
 #交易密码
-password = 123456
+#password = 123456
+password = 970769
 
 #股票代码
 code = 'HK.00700'
+#code = 'SH.600380'
 
 #股票市场
 market = 'HK'
+#market = 'SH'
 
 #交易环境，实盘交易：0 模拟环境：1（美股不支持模拟）
 trade_env = 1
@@ -28,33 +34,53 @@ trade_env = 1
 '''
 #实例化行情上下文对象
 quote_ctx = ft.OpenQuoteContext(host = api_svr_ip, port = api_svr_port)
-
-#订阅高频数据查询
-#quote_ctx.subscribe(code, 'ORDER_BOOK', push = False) #摆盘
-#quote_ctx.subscribe(code, 'QUOTE', push = False) #报价
-#quote_ctx.subscribe(code, 'TICKER', push = False) #逐笔
-#quote_ctx.subscribe(code, 'K_DAY', push = False) #日K
-#quote_ctx.subscribe(code, 'RT_DATA', push = False) #分时
-quote_ctx.subscribe(code, 'BROKER', push = False) #经济队列
-
-#查看当前订阅
-ret_code, ret_data = quote_ctx.query_subscription(0)
-print ret_data
+#print(quote_ctx.get_global_state())
 
 '''
-#上下文控制
+异步控制
 '''
 #开启异步数据接收
 quote_ctx.start()
 
 #停止异步数据接受
-quote_ctx.stop()
+#quote_ctx.stop()
 
 #设置用于异步处理数据的回调对象
-quote_ctx.set_handler('')
+#quote_ctx.set_handler(handler)
 
 '''
-#低频数据接口
+高频行情订阅
+'''
+#摆盘
+#quote_ctx.subscribe(code, 'ORDER_BOOK', push = True)
+#quote_ctx.set_handler(OrderBookHandler())
+
+# 报价
+#quote_ctx.subscribe(code, 'QUOTE', push = True)
+#quote_ctx.set_handler(StockQuoteHandler())
+
+#逐笔
+#quote_ctx.subscribe(code, 'TICKER', push = True)
+#quote_ctx.set_handler(TickerHandler())
+
+#日K
+#quote_ctx.subscribe(code, 'K_DAY', push = True)
+#quote_ctx.set_handler(CurKlineHandler())
+
+#分时
+#quote_ctx.subscribe(code, 'RT_DATA', push = True)
+#quote_ctx.set_handler(RTDataHandler())
+
+#经济队列
+quote_ctx.subscribe(code, 'BROKER', push = True)
+quote_ctx.set_handler(BrokerHandler())
+
+#查看当前订阅
+#ret_code, ret_data = quote_ctx.query_subscription(0)
+#print ret_data
+
+'''
+低频行情
 '''
 #获取交易日
 #ret, trading_days = quote_ctx.get_trading_days(market=market, '1970-01-02', '2017-01-01')
@@ -78,7 +104,7 @@ quote_ctx.set_handler('')
 #ret, plate_stock = quote_ctx.get_plate_stock('SH.881166')
 
 '''
-#高频数据接口
+高频行情
 '''
 #获取报价
 #ret, stock_quote = quote_ctx.get_stock_quote([code])
@@ -105,13 +131,9 @@ quote_ctx.set_handler('')
 #print broker_queue
 
 '''
-#实例化港股交易上下文对象
+#交易上下文
 '''
 #trader_hk_ctx = ft.OpenHKTradeContext(host = api_svr_ip, port = api_svr_port)
-
-'''
-#实例化美股交易上下文对象
-'''
 #trader_us_ctx = ft.OpenUSTradeContext(host = api_svr_ip, port = api_svr_port)
 
 '''
@@ -145,3 +167,6 @@ quote_ctx.set_handler('')
 
 #查询成交列表
 #ret_code, ret_data = trader_hk_ctx.deal_list_query(envtype = trade_env)
+
+time.sleep(6)
+quote_ctx.stop()
