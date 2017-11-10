@@ -32,10 +32,10 @@ class StockBarData(object):
         self.v_ma20 = 0
         self.turnover = 0
 
-class HSStocksLocalEngine(object):
+class StocksLocalEngine(object):
     '''功能引擎（从tushare下载所有股票列表、下载历史日k线数据，并且保存到本地数据库）'''
     def __init__(self, dbName):
-        super(HSStocksLocalEngine, self).__init__()
+        super(StocksLocalEngine, self).__init__()
         self.dbName = dbName
         self.dataCount = 0
         self.emptyDataCount = 0
@@ -163,5 +163,5 @@ class HSStocksLocalEngine(object):
             print u'数据更新完成\n'
         self.updateHistory(stockCode)
 
-engine = HSStocksLocalEngine(dbName = 'Stocks_Daily_Db' )
+engine = StocksLocalEngine(dbName = 'Stocks_Daily_Db' )
 engine.startWork()
