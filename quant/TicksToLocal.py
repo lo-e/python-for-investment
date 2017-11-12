@@ -20,7 +20,7 @@ class TicksLocalEngine(object):
         self.collection = client[TICK_DB_NAME][self.vtCode]
         self.collection.create_index('datetime')
         self.historyCollection = client[TICK_DB_NAME]['UpdateHistory']
-        print unicode('======即将更新 %s 的tick数据（开始日期：%s）======' % (code, self.startDate), 'utf-8')
+        print unicode('\n======即将更新 %s 的tick数据（开始日期：%s）======\n' % (code, self.startDate), 'utf-8')
         print u'MongoDB连接成功\n'
 
     def startWork(self):
@@ -102,7 +102,7 @@ class TicksLocalEngine(object):
                 tick.symbol = code
                 tick.exchange = exchange
                 tick.vcSymbol = self.vtCode
-                tick.lastprice = row['price']
+                tick.lastPrice = row['price']
                 tick.lastvolume = row['volume']
                 #保存tick数据到数据库
                 self.collection.update_many({'datetime':tick.datetime}, {'$set':tick.__dict__}, upsert = True)
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     code = '600380'
     exchange = 'SSE'
     #起始时间
-    startDate = '2017-11-01'
+    startDate = '2017-01-01'
 
     engine = TicksLocalEngine(code, exchange, startDate)
     engine.startWork()
