@@ -49,6 +49,7 @@ class TicksLocalEngine(object):
     def needUpdateChecking(self, date):
         '''检查数据库该日期的tick数据是否存在'''
         #过滤非交易日
+
         if len(self.tradingDays):
             #根据futuAPI的查询结果
             dateStr = date.strftime('%Y-%m-%d')
@@ -112,7 +113,6 @@ class TicksLocalEngine(object):
         ret, trading_days = quote_ctx.get_trading_days(market, self.startDate, todayStr)
         if len(trading_days):
             self.tradingDays = trading_days
-            print trading_days
 
     def downloadToLocal(self, date):
         ''' 下载某天的tick数据，并保存到数据库 '''
@@ -147,10 +147,17 @@ class TicksLocalEngine(object):
 
 if __name__ == '__main__':
     #合约代码
-    code = '600380'
-    exchange = 'SSE'
+    code = raw_input('code: ')
+    if not len(code):
+        code = '600380'
+    #交易所
+    exchange = raw_input('exchange: ')
+    if not len(exchange):
+        exchange = 'SSE'
     #起始时间
-    startDate = '2017-01-01'
+    startDate = raw_input('start date: ')
+    if not len(startDate):
+        startDate = '2017-01-01'
 
     engine = TicksLocalEngine(code, exchange, startDate)
     engine.startWork()
