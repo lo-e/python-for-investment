@@ -19,12 +19,12 @@ api_svr_port = 11111
 password = 970769
 
 #股票代码
-code = 'HK.00700'
-#code = 'SH.600380'
+#code = 'HK.00700'
+code = 'SH.600380'
 
 #股票市场
-market = 'HK'
-#market = 'SH'
+#market = 'HK'
+market = 'SH'
 
 #交易环境，实盘交易：0 模拟环境：1（美股不支持模拟）
 trade_env = 1
@@ -72,8 +72,8 @@ quote_ctx.start()
 #quote_ctx.set_handler(RTDataHandler())
 
 #经济队列
-quote_ctx.subscribe(code, 'BROKER', push = True)
-quote_ctx.set_handler(BrokerHandler())
+#quote_ctx.subscribe(code, 'BROKER', push = True)
+#quote_ctx.set_handler(BrokerHandler())
 
 #查看当前订阅
 #ret_code, ret_data = quote_ctx.query_subscription(0)
@@ -83,7 +83,8 @@ quote_ctx.set_handler(BrokerHandler())
 低频行情
 '''
 #获取交易日
-#ret, trading_days = quote_ctx.get_trading_days(market=market, '1970-01-02', '2017-01-01')
+ret, trading_days = quote_ctx.get_trading_days(market, '2017-01-01', '2017-11-14')
+print trading_days
 
 #获取股票信息
 #ret, stock_list = quote_ctx.get_stock_basicinfo(market)
