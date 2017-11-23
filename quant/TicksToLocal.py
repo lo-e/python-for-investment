@@ -7,16 +7,20 @@ from datetime import datetime, timedelta
 from vnpy.trader.vtObject import VtTickData
 from vnpy.trader.app.ctaStrategy.ctaBase import TICK_DB_NAME
 import futuquant as ft
+import sys
+import pandas as pd
 
 class TicksLocalEngine(object):
     '''功能引擎（从起始日期开始下载某只股票所有tick数据）'''
-    def __init__(self, code, exchange, startDate):
+    def __init__(self, code, exchange, asset, startDate):
         super(TicksLocalEngine, self).__init__()
         self.code = code
         self.exchange = exchange
         self.vtCode = code + '.' + exchange
+        self.asset = asset
         self.startDate = startDate
         self.tradingDays = []
+        self.cons = ts.get_apis()
 
         #获取数据库
         client = pymongo.MongoClient('localhost', 27017)
@@ -28,7 +32,7 @@ class TicksLocalEngine(object):
 
     def startWork(self):
         #获取交易日列表
-        self.requestTradingDays()
+        #self.requestTradingDays()
         #开始的日期
         date = datetime.strptime(self.startDate, '%Y-%m-%d')
         delta = timedelta(1)
@@ -119,46 +123,84 @@ class TicksLocalEngine(object):
         time.sleep(0.5)
         print '======%s======' % date.date()
         #获取tick数据
-        tickData = ts.get_tick_data(code, date.strftime('%Y-%m-%d'))
-        if len(tickData) > 6:
+        #tickData = ts.get_tick_data(code, date.strftime('%Y-%m-%d'))
+        tickData = None
+        if self.asset == 'X':
+            tickData = ts.tick(self.code, self.cons, date.strftime('%Y-%m-%d'), asset = 'X')
+        else:
+            tickData = ts.tick(self.code, self.cons, date.strftime('%Y-%m-%d'))
+
+        isDf = isinstance(tickData, pd.DataFrame)
+        if isDf:
             #排除数据有误或者当天没有数据的情况
             for index, row in tickData.iterrows():
                 tick = VtTickData()
                 tick.date = date.strftime('%Y-%m-%d')
-                tick.time = row['time']
+
+                the = row['date']
+                dt = the.to_datetime()
+                tick.time = dt.strftime('%H:%M:%S')
+
                 tick.datetime = datetime.strptime(tick.date + ' ' + tick.time, '%Y-%m-%d %H:%M:%S')
     
                 tick.symbol = code
                 tick.exchange = exchange
                 tick.vcSymbol = self.vtCode
-                tick.lastPrice = row['price']
-                tick.lastvolume = row['volume']
-                tick.askPrice1 = row['price']
-                tick.bidPrice1 = row['price']
+                tick.lastPrice = row['vol']
+                tick.lastvolume = row['oi_change']
+                tick.askPrice1 = row['vol']
+                tick.bidPrice1 = row['vol']
                 #保存tick数据到数据库
                 self.collection.update_many({'datetime':tick.datetime}, {'$set':tick.__dict__}, upsert = True)
             self.updateHistory(date)
             print u'数据更新\n'
         else:
-            print unicode(tickData.ix[0]['time'], 'utf-8')
+            print u'当天没有数据！！'
             print '\n'
+
+    def end(self):
+        ts.close_apis(self.cons)
+        sys.exit(0)
 
 
 
 if __name__ == '__main__':
+    
     #合约代码
-    code = raw_input('code: ')
+    code = raw_input('code[600380]: ')
     if not len(code):
-        code = '600380'
-    #交易所
-    exchange = raw_input('exchange: ')
-    if not len(exchange):
-        exchange = 'SSE'
-    #起始时间
-    startDate = raw_input('start date: ')
-    if not len(startDate):
-        startDate = '2017-01-01'
+        print u'合约代码不能为空！！'
+        sys.exit(0)
 
-    engine = TicksLocalEngine(code, exchange, startDate)
+    #交易所
+    exchange = raw_input('exchange[SSE]: ')
+    if not len(exchange):
+        print u'交易所不能为空！！'
+        sys.exit(0)
+
+    #合约类型
+    print u'合约类型：期货X，A股直接回车'
+    asset = raw_input('asset[X]: ')
+
+    #起始时间
+    startDate = raw_input('start date[2017-01-01]: ')
+    if not len(startDate):
+        print u'起始日期不能为空！！'
+        sys.exit(0)
+        
+
+    engine = TicksLocalEngine(code, exchange, asset, startDate)
     engine.startWork()
 
+
+    '''
+    cons = ts.get_apis()
+    tick = ts.tick('rb1805', cons, '2017-11-19', asset = 'X')
+    if  tick != None:
+        print 'yes'
+    else:
+        print 'haha'
+    #print type(tick)
+    ts.close_apis(cons)
+'''
+    
