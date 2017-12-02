@@ -49,6 +49,7 @@ class TicksLocalEngine(object):
                 #更新到当天，结束下载
                 stop = True
                 print u'======已完成所有更新======'
+                self.end()
 
     def needUpdateChecking(self, date):
         '''检查数据库该日期的tick数据是否存在'''
@@ -191,16 +192,4 @@ if __name__ == '__main__':
 
     engine = TicksLocalEngine(code, exchange, asset, startDate)
     engine.startWork()
-
-
-    '''
-    cons = ts.get_apis()
-    tick = ts.tick('rb1805', cons, '2017-11-19', asset = 'X')
-    if  tick != None:
-        print 'yes'
-    else:
-        print 'haha'
-    #print type(tick)
-    ts.close_apis(cons)
-'''
     
