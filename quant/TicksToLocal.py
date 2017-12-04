@@ -193,16 +193,4 @@ if __name__ == '__main__':
 
     engine = TicksLocalEngine(code, exchange, asset, startDate)
     engine.startWork()
-
-
-    '''
-    cons = ts.get_apis()
-    tick = ts.tick('rb1805', cons, '2017-11-19', asset = 'X')
-    if  tick != None:
-        print 'yes'
-    else:
-        print 'haha'
-    #print type(tick)
-    ts.close_apis(cons)
-'''
     
