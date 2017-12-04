@@ -1,7 +1,7 @@
 #-- coding: utf-8 --
 
 import tushare as ts
-import pymongo
+import pymongo  
 import time
 from datetime import datetime, timedelta
 from vnpy.trader.vtObject import VtTickData
@@ -32,23 +32,25 @@ class TicksLocalEngine(object):
 
     def startWork(self):
         #获取交易日列表
-        #self.requestTradingDays()
+        self.requestTradingDays()
         #开始的日期
         date = datetime.strptime(self.startDate, '%Y-%m-%d')
         delta = timedelta(1)
 
         stop = False
+        endDate = (datetime.now()-delta).date()
         while not stop:
             if self.needUpdateChecking(date):
                 self.downloadToLocal(date)
 
-            if date.date() < datetime.now().date():
+            if date.date() < endDate:
                 #逐天下载
                 date = date + delta
             else:
                 #更新到当天，结束下载
                 stop = True
                 print u'======已完成所有更新======'
+                self.end()
 
     def needUpdateChecking(self, date):
         '''检查数据库该日期的tick数据是否存在'''
