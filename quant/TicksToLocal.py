@@ -3,12 +3,23 @@
 import tushare as ts
 import pymongo  
 import time
-from datetime import datetime, timedelta
+from datetime import timedelta
+import datetime
 from vnpy.trader.vtObject import VtTickData
 from vnpy.trader.app.ctaStrategy.ctaBase import TICK_DB_NAME
 import futuquant as ft
 import sys
 import pandas as pd
+
+#交易时间
+MORNING_START = datetime.time(9, 0)
+MORNING_REST = datetime.time(10, 15)
+MORNING_RESTART = datetime.time(10, 30)
+MORNING_END = datetime.time(11, 30)
+AFTERNOON_START = datetime.time(13, 30)
+AFTERNOON_END = datetime.time(15, 0)
+NIGHT_START = datetime.time(21, 0)
+NIGHT_END = datetime.time(23, 0)
 
 class TicksLocalEngine(object):
     '''功能引擎（从起始日期开始下载某只股票所有tick数据）'''
@@ -34,11 +45,11 @@ class TicksLocalEngine(object):
         #获取交易日列表
         self.requestTradingDays()
         #开始的日期
-        date = datetime.strptime(self.startDate, '%Y-%m-%d')
+        date = datetime.datetime.strptime(self.startDate, '%Y-%m-%d')
         delta = timedelta(1)
 
         stop = False
-        endDate = (datetime.now()-delta).date()
+        endDate = (datetime.datetime.now()-delta).date()
         while not stop:
             if self.needUpdateChecking(date):
                 self.downloadToLocal(date)
@@ -115,7 +126,7 @@ class TicksLocalEngine(object):
         #实例化行情上下文对象
         quote_ctx = ft.OpenQuoteContext(host = api_svr_ip, port = api_svr_port)
         #获取交易日列表
-        todayStr = datetime.now().strftime('%Y-%m-%d')
+        todayStr = datetime.datetime.now().strftime('%Y-%m-%d')
         ret, trading_days = quote_ctx.get_trading_days(market, self.startDate, todayStr)
         if len(trading_days):
             self.tradingDays = trading_days
@@ -136,18 +147,31 @@ class TicksLocalEngine(object):
         if isDf:
             #排除数据有误或者当天没有数据的情况
             for index, row in tickData.iterrows():
-                tick = VtTickData()
-                tick.date = date.strftime('%Y-%m-%d')
-
                 the = row['date']
                 dt = the.to_datetime()
+                t = dt.time()
+                #过滤无效数据
+                fakeData = True
+                if ( (MORNING_START <= t <MORNING_REST) or (MORNING_RESTART <= t < MORNING_END) or (AFTERNOON_START <= t < AFTERNOON_END) or (NIGHT_START <= t < NIGHT_END)):
+                    fakeData = False
+                if fakeData:
+                    print dt
+                    print u'【剔除无效数据】'
+                    continue
+
+                if NIGHT_START <= t < NIGHT_END:
+                    dt = dt - timedelta(1)
+
+                tick = VtTickData()
+                tick.date = dt.strftime('%Y-%m-%d')
+
                 tick.time = dt.strftime('%H:%M:%S')
 
-                tick.datetime = datetime.strptime(tick.date + ' ' + tick.time, '%Y-%m-%d %H:%M:%S')
+                tick.datetime = datetime.datetime.strptime(tick.date + ' ' + tick.time, '%Y-%m-%d %H:%M:%S')
     
                 tick.symbol = code
                 tick.exchange = exchange
-                tick.vcSymbol = self.vtCode
+                tick.vtSymbol = self.vtCode
                 tick.lastPrice = row['vol']
                 tick.lastvolume = row['oi_change']
                 tick.askPrice1 = row['vol']
