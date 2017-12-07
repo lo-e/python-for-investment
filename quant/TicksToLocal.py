@@ -130,6 +130,7 @@ class TicksLocalEngine(object):
         ret, trading_days = quote_ctx.get_trading_days(market, self.startDate, todayStr)
         if len(trading_days):
             self.tradingDays = trading_days
+        quote_ctx.close()
 
     def downloadToLocal(self, date):
         ''' 下载某天的tick数据，并保存到数据库 '''
