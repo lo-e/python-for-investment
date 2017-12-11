@@ -12,14 +12,21 @@ import sys
 import pandas as pd
 
 #交易时间
-MORNING_START = datetime.time(9, 0)
-MORNING_REST = datetime.time(10, 15)
-MORNING_RESTART = datetime.time(10, 30)
-MORNING_END = datetime.time(11, 30)
-AFTERNOON_START = datetime.time(13, 30)
-AFTERNOON_END = datetime.time(15, 0)
-NIGHT_START = datetime.time(21, 0)
-NIGHT_END = datetime.time(23, 0)
+#商品期货
+MORNING_START_CF = datetime.time(9, 0)
+MORNING_REST_CF = datetime.time(10, 15)
+MORNING_RESTART_CF = datetime.time(10, 30)
+MORNING_END_CF = datetime.time(11, 30)
+AFTERNOON_START_CF = datetime.time(13, 30)
+AFTERNOON_END_CF = datetime.time(15, 0)
+NIGHT_START_CF = datetime.time(21, 0)
+NIGHT_END_CF = datetime.time(23, 0)
+
+#商品期货
+MORNING_START_SF = datetime.time(9, 30)
+MORNING_END_SF = datetime.time(11, 30)
+AFTERNOON_START_SF = datetime.time(13, 0)
+AFTERNOON_END_SF = datetime.time(15, 0)
 
 class TicksLocalEngine(object):
     '''功能引擎（从起始日期开始下载某只股票所有tick数据）'''
@@ -139,7 +146,8 @@ class TicksLocalEngine(object):
         #获取tick数据
         #tickData = ts.get_tick_data(code, date.strftime('%Y-%m-%d'))
         tickData = None
-        if self.asset == 'X':
+        if (self.asset == '1') or (self.asset == '2'):
+            #商品期货、股指期货
             tickData = ts.tick(self.code, self.cons, date.strftime('%Y-%m-%d'), asset = 'X')
         else:
             tickData = ts.tick(self.code, self.cons, date.strftime('%Y-%m-%d'))
@@ -153,14 +161,22 @@ class TicksLocalEngine(object):
                 t = dt.time()
                 #过滤无效数据
                 fakeData = True
-                if ( (MORNING_START <= t <MORNING_REST) or (MORNING_RESTART <= t < MORNING_END) or (AFTERNOON_START <= t < AFTERNOON_END) or (NIGHT_START <= t < NIGHT_END)):
-                    fakeData = False
+                if self.asset == '1':
+                    #商品期货
+                    if ( (MORNING_START_CF <= t <MORNING_REST_CF) or (MORNING_RESTART_CF <= t < MORNING_END_CF) or (AFTERNOON_START_CF <= t < AFTERNOON_END_CF) or (NIGHT_START_CF <= t < NIGHT_END_CF)):
+                        fakeData = False
+                elif self.asset == '2':
+                    #股指期货
+                    if ( (MORNING_START_SF <= t < MORNING_END_SF) or (AFTERNOON_START_SF <= t < AFTERNOON_END_SF)):
+                        fakeData = False
+
                 if fakeData:
                     print dt
                     print u'【剔除无效数据】'
                     continue
 
-                if NIGHT_START <= t < NIGHT_END:
+                if (self.asset == '1') and (NIGHT_START <= t < NIGHT_END):
+                    #商品期货夜盘
                     dt = dt - timedelta(1)
 
                 tick = VtTickData()
@@ -206,8 +222,8 @@ if __name__ == '__main__':
         sys.exit(0)
 
     #合约类型
-    print u'合约类型：期货X，A股直接回车'
-    asset = raw_input('asset[X]: ')
+    print u'合约类型：1 商品期货；2 股指期货：回车 A股'
+    asset = raw_input('asset: ')
 
     #起始时间
     startDate = raw_input('start date[2017-01-01]: ')
