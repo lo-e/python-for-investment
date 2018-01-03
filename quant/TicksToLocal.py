@@ -22,7 +22,7 @@ AFTERNOON_END_CF = datetime.time(15, 0)
 NIGHT_START_CF = datetime.time(21, 0)
 NIGHT_END_CF = datetime.time(23, 0)
 
-#商品期货
+#股指期货
 MORNING_START_SF = datetime.time(9, 30)
 MORNING_END_SF = datetime.time(11, 30)
 AFTERNOON_START_SF = datetime.time(13, 0)
@@ -175,7 +175,7 @@ class TicksLocalEngine(object):
                     print u'【剔除无效数据】'
                     continue
 
-                if (self.asset == '1') and (NIGHT_START <= t < NIGHT_END):
+                if (self.asset == '1') and (NIGHT_START_CF <= t < NIGHT_END_CF):
                     #商品期货夜盘
                     dt = dt - timedelta(1)
 
