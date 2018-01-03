@@ -1,27 +1,24 @@
-# -- coding: utf8 --
+#coding: utf8
+import pdb
 
-import exercise49
-import sys
-import os
-import test1
+import thread
 
-class Cat(object):
-	"""docstring for Cat"""
-	a = 'yes yes'
-	def __init__(self, name):
-		super(Cat, self).__init__()
-		self.name = name
+def action(a, b):
+	print a, b
 
-class BlackCat(Cat):
-	"""docstring for BlackCat"""
-	def __init__(self, name, like):
-		super(BlackCat, self).__init__(name)
-		self.like = like
+def action1(a, b):
+	print a, b
 
-	def action(self):
-		print self.name, self.like
-		
-		
+def action2(a, b):
+	print a, b
 
-the_cat = BlackCat('pika', 'food')
-print the_cat.a
+thread.start_new_thread(action, (1, 2,))
+print 'yes'
+thread.start_new_thread(action1, (5, 6,))
+print 'ok'
+print 'xyz'
+thread.start_new_thread(action2, (8, 9,))
+print 'abc'
+
+
+
