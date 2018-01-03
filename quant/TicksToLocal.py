@@ -158,7 +158,7 @@ class TicksLocalEngine(object):
                     print dt
                     print u'【剔除无效数据】'
                     continue
-
+                #自动修正夜盘的时间
                 if NIGHT_START <= t < NIGHT_END:
                     dt = dt - timedelta(1)
 
