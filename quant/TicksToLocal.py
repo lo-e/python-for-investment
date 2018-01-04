@@ -174,14 +174,10 @@ class TicksLocalEngine(object):
                     print dt
                     print u'【剔除无效数据】'
                     continue
-<<<<<<< HEAD
-                #自动修正夜盘的时间
-                if NIGHT_START <= t < NIGHT_END:
-=======
 
+                #自动修正夜盘的时间
                 if (self.asset == '1') and (NIGHT_START_CF <= t < NIGHT_END_CF):
                     #商品期货夜盘
->>>>>>> origin/master
                     dt = dt - timedelta(1)
 
                 tick = VtTickData()
@@ -213,7 +209,17 @@ class TicksLocalEngine(object):
 
 
 if __name__ == '__main__':
-    
+    #----- 测试 ------
+    test = raw_input('TEST? [y/n]')
+    if test == 'y':
+        code = 'rb1805'
+        exchange = 'SHFE'
+        asset = 1
+        startDate = '2017-05-16'
+        engine = TicksLocalEngine(code, exchange, asset, startDate)
+        engine.startWork()
+        return
+
     #合约代码
     code = raw_input('code[600380]: ')
     if not len(code):
