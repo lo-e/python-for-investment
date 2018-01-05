@@ -218,31 +218,30 @@ if __name__ == '__main__':
         startDate = '2017-05-16'
         engine = TicksLocalEngine(code, exchange, asset, startDate)
         engine.startWork()
-        return
+    else:
+        #合约代码
+        code = raw_input('code[600380]: ')
+        if not len(code):
+            print u'合约代码不能为空！！'
+            sys.exit(0)
 
-    #合约代码
-    code = raw_input('code[600380]: ')
-    if not len(code):
-        print u'合约代码不能为空！！'
-        sys.exit(0)
+        #交易所
+        exchange = raw_input('exchange[SSE]: ')
+        if not len(exchange):
+            print u'交易所不能为空！！'
+            sys.exit(0)
 
-    #交易所
-    exchange = raw_input('exchange[SSE]: ')
-    if not len(exchange):
-        print u'交易所不能为空！！'
-        sys.exit(0)
+        #合约类型
+        print u'合约类型：1 商品期货；2 股指期货：回车 A股'
+        asset = raw_input('asset: ')
 
-    #合约类型
-    print u'合约类型：1 商品期货；2 股指期货：回车 A股'
-    asset = raw_input('asset: ')
-
-    #起始时间
-    startDate = raw_input('start date[2017-01-01]: ')
-    if not len(startDate):
-        print u'起始日期不能为空！！'
-        sys.exit(0)
+        #起始时间
+        startDate = raw_input('start date[2017-01-01]: ')
+        if not len(startDate):
+            print u'起始日期不能为空！！'
+            sys.exit(0)
         
 
-    engine = TicksLocalEngine(code, exchange, asset, startDate)
-    engine.startWork()
+        engine = TicksLocalEngine(code, exchange, asset, startDate)
+        engine.startWork()
     
