@@ -146,7 +146,7 @@ class TicksLocalEngine(object):
         #获取tick数据
         #tickData = ts.get_tick_data(code, date.strftime('%Y-%m-%d'))
         tickData = None
-        if (self.asset == '1') or (self.asset == '2'):
+        if (self.asset == 1) or (self.asset == 2):
             #商品期货、股指期货
             tickData = ts.tick(self.code, self.cons, date.strftime('%Y-%m-%d'), asset = 'X')
         else:
@@ -161,11 +161,11 @@ class TicksLocalEngine(object):
                 t = dt.time()
                 #过滤无效数据
                 fakeData = True
-                if self.asset == '1':
+                if self.asset == 1:
                     #商品期货
                     if ( (MORNING_START_CF <= t <MORNING_REST_CF) or (MORNING_RESTART_CF <= t < MORNING_END_CF) or (AFTERNOON_START_CF <= t < AFTERNOON_END_CF) or (NIGHT_START_CF <= t < NIGHT_END_CF)):
                         fakeData = False
-                elif self.asset == '2':
+                elif self.asset == 2:
                     #股指期货
                     if ( (MORNING_START_SF <= t < MORNING_END_SF) or (AFTERNOON_START_SF <= t < AFTERNOON_END_SF)):
                         fakeData = False
@@ -176,7 +176,7 @@ class TicksLocalEngine(object):
                     continue
 
                 #自动修正夜盘的时间
-                if (self.asset == '1') and (NIGHT_START_CF <= t < NIGHT_END_CF):
+                if (self.asset == 1) and (NIGHT_START_CF <= t < NIGHT_END_CF):
                     #商品期货夜盘
                     dt = dt - timedelta(1)
 

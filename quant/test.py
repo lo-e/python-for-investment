@@ -3,5 +3,6 @@
 import pandas as pd
 import tushare as ts
 
-
-print 'abc'
+if __name__ == '__main__':
+    print 'abc'
+    print 'test'
