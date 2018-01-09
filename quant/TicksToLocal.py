@@ -233,7 +233,7 @@ if __name__ == '__main__':
 
         #合约类型
         print u'合约类型：1 商品期货；2 股指期货：回车 A股'
-        asset = raw_input('asset: ')
+        asset = int(raw_input('asset: '))
 
         #起始时间
         startDate = raw_input('start date[2017-01-01]: ')
