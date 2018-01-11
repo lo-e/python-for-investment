@@ -177,7 +177,7 @@ class TicksLocalEngine(object):
                     print u'【剔除无效数据】'
                     continue
 
-                #自动修正夜盘的时间
+                #修正夜盘的时间
                 if (self.asset == 1) and (NIGHT_START_CF <= t < NIGHT_END_CF):
                     #商品期货夜盘
                     dt = dt - timedelta(1)
