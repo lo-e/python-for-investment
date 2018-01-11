@@ -155,6 +155,8 @@ class TicksLocalEngine(object):
         isDf = isinstance(tickData, pd.DataFrame)
         if isDf:
             #排除数据有误或者当天没有数据的情况
+            lastDt = None
+            mSecond = 0
             for index, row in tickData.iterrows():
                 the = row['date']
                 dt = the.to_datetime()
@@ -180,12 +182,20 @@ class TicksLocalEngine(object):
                     #商品期货夜盘
                     dt = dt - timedelta(1)
 
+                #添加毫秒（tushare下载的tick数据没有毫秒导致相同秒的数据导入数据库会被覆盖缺失）
+                if (not lastDt) or lastDt != dt:
+                    mSecond = 0
+                    lastDt = dt
+                else:
+                    mSecond += 100000
+                dt = dt.replace(microsecond = mSecond)
+
+                #数据封装成VtTickData
                 tick = VtTickData()
+
                 tick.date = dt.strftime('%Y-%m-%d')
-
-                tick.time = dt.strftime('%H:%M:%S')
-
-                tick.datetime = datetime.datetime.strptime(tick.date + ' ' + tick.time, '%Y-%m-%d %H:%M:%S')
+                tick.time = dt.strftime('%H:%M:%S.%f')
+                tick.datetime = datetime.datetime.strptime(tick.date + ' ' + tick.time, '%Y-%m-%d %H:%M:%S.%f')
     
                 tick.symbol = code
                 tick.exchange = exchange
