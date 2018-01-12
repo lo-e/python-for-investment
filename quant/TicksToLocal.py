@@ -187,7 +187,7 @@ class TicksLocalEngine(object):
                     mSecond = 0
                     lastDt = dt
                 else:
-                    mSecond += 100000
+                    mSecond += 1000
                 dt = dt.replace(microsecond = mSecond)
 
                 #数据封装成VtTickData
