@@ -1,0 +1,58 @@
+# C++源代码
+ipch/
+Release/
+
+*.sdf
+*.suo
+*.exp
+*.pdb
+*.cd
+
+# Python编译文件
+*.pyc
+*.pyo
+
+# WingIDE文件
+*.wpr
+*.wpu
+
+# 压缩文件
+*.zip
+
+# API的.con文件
+*.con
+
+# visual studio
+*.opensdf
+
+# 本地持久化文件
+*.vn
+
+
+
+# 其他文件
+*.dump
+*.vssettings
+*.klg
+*.lkc
+
+# 不想同步的
+*.local
+*.temp
+*.vt
+*.log
+
+vn.ctp/build/*
+vn.lts/build/*
+.idea
+.vscode
+#.gitignore
+
+vn.trader/ctaAlgo/data/*
+vn.trader/build/*
+vn.trader/dist/*
+*.bak
+
+
+# ====== add by loe ======
+*.idea/workspace.xml
