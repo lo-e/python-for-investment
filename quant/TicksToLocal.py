@@ -45,6 +45,7 @@ class TicksLocalEngine(object):
         self.collection = client[TICK_DB_NAME][self.vtCode]
         self.collection.create_index('datetime')
         self.historyCollection = client[TICK_DB_NAME]['UpdateHistory']
+        self.historyCollection.create_index('code')
         print unicode('\n======即将更新 %s 的tick数据（开始日期：%s）======\n' % (code, self.startDate), 'utf-8')
         print u'MongoDB连接成功\n'
 
@@ -84,7 +85,7 @@ class TicksLocalEngine(object):
             return False
 
          #查询数据库
-        flt = {'code':self.code}        
+        flt = {'code':self.vtCode}
         cursor = self.historyCollection.find(flt)
         #拿到历史记录
         codeHistory = {}
@@ -104,10 +105,10 @@ class TicksLocalEngine(object):
         '''更新数据库记录该日期的tick数据保存成功'''
 
         #查询数据库
-        flt = {'code':self.code}        
+        flt = {'code':self.vtCode}
         cursor = self.historyCollection.find(flt)
         #拿到历史记录
-        codeHistory = {'code':self.code}
+        codeHistory = {'code':self.vtCode}
         for dic in cursor:
             codeHistory = dic
         #历史日期记录
@@ -120,7 +121,7 @@ class TicksLocalEngine(object):
 
         codeHistory['dateList'] = dateList
         #更新数据库
-        self.historyCollection.update_many({'code':self.code}, {'$set':codeHistory}, upsert = True)
+        self.historyCollection.update_many({'code':self.vtCode}, {'$set':codeHistory}, upsert = True)
 
     def requestTradingDays(self):
         '''futu API查询交易日列表'''
@@ -156,7 +157,11 @@ class TicksLocalEngine(object):
         if isDf:
             #排除数据有误或者当天没有数据的情况
             lastDt = None
+            #tushare数据不带毫秒，导致同一秒的数据会被覆盖，这个参数用于避免而采取的手动添加毫秒区分
             mSecond = 0
+
+            loadStartTime = time.time()
+            loadCount = 0
             for index, row in tickData.iterrows():
                 the = row['date']
                 dt = the.to_datetime()
@@ -186,8 +191,10 @@ class TicksLocalEngine(object):
                 if (not lastDt) or lastDt != dt:
                     mSecond = 0
                     lastDt = dt
+
                 else:
                     mSecond += 1000
+
                 dt = dt.replace(microsecond = mSecond)
 
                 #数据封装成VtTickData
@@ -206,7 +213,12 @@ class TicksLocalEngine(object):
                 tick.bidPrice1 = row['vol']
                 #保存tick数据到数据库
                 self.collection.update_many({'datetime':tick.datetime}, {'$set':tick.__dict__}, upsert = True)
+                loadCount += 1
             self.updateHistory(date)
+
+            sub = time.time() - loadStartTime
+            print u'导入数据库用时：', sub, 's'
+            print u'数据量：', loadCount
             print u'数据更新\n'
         else:
             print u'当天没有数据！！'
@@ -223,7 +235,7 @@ if __name__ == '__main__':
     test = raw_input('TEST? [y/n]')
     if test == 'y':
         code = 'rb1805'
-        exchange = 'SHFE'
+        exchange = 'TS'
         asset = 1
         startDate = '2017-05-16'
         engine = TicksLocalEngine(code, exchange, asset, startDate)
@@ -236,7 +248,7 @@ if __name__ == '__main__':
             sys.exit(0)
 
         #交易所
-        exchange = raw_input('exchange[SSE]: ')
+        exchange = raw_input('exchange[TS]: ')
         if not len(exchange):
             print u'交易所不能为空！！'
             sys.exit(0)
