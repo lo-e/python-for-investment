@@ -18,7 +18,10 @@ MORNING_END_CF = datetime.time(11, 30)
 AFTERNOON_START_CF = datetime.time(13, 30)
 AFTERNOON_END_CF = datetime.time(15, 0)
 NIGHT_START_CF = datetime.time(21, 0)
-NIGHT_END_CF = datetime.time(23, 0)
+
+# 商品期货夜盘截至时间
+NIGHT_END_CF_1 = datetime.time(23, 0)
+NIGHT_END_CF_2 = datetime.time(23, 30)
 
 #股指期货
 MORNING_START_SF = datetime.time(9, 30)
@@ -27,10 +30,12 @@ AFTERNOON_START_SF = datetime.time(13, 0)
 AFTERNOON_END_SF = datetime.time(15, 0)
 
 class csvsLocalEngine(object):
-    def __init__(self, type):
+    def __init__(self, type, night):
         super(csvsLocalEngine, self).__init__()
         # 数据类型，不同品种期货交易时间特别是夜盘时间会有所差别，为了剔除无效数据而设置 1、商品期货  2、股指期货
         self.dataType = type
+        # 夜盘时间【1、（21:00 - 23:00) 2、(21:00 - 23:30)】
+        self.night = night
         # 项目路径
         self.walkingDir = 'CSVs'
         # 获取数据库
@@ -86,10 +91,13 @@ class csvsLocalEngine(object):
                             fakeData = True
                             if self.dataType == 1:
                                 # 商品期货
+                                nightEndTime = NIGHT_END_CF_1
+                                if self.night == 2:
+                                    nightEndTime = NIGHT_END_CF_2
                                 if ((MORNING_START_CF <= t < MORNING_REST_CF) or (
                                                 MORNING_RESTART_CF <= t < MORNING_END_CF) or (
                                                 AFTERNOON_START_CF <= t < AFTERNOON_END_CF) or (
-                                                NIGHT_START_CF <= t < NIGHT_END_CF)):
+                                                NIGHT_START_CF <= t < nightEndTime)):
                                     fakeData = False
                             elif self.dataType == 2:
                                 # 股指期货
@@ -173,6 +181,9 @@ class csvsLocalEngine(object):
 
 
 if __name__ == '__main__':
-    type = raw_input(u'数据类型【1、商品 2、股指】：')
-    engine = csvsLocalEngine(int(type))
+    type = int(raw_input(u'数据类型【1、商品 2、股指】：'))
+    night = 0
+    if type == 1:
+        night = int(raw_input(u'夜盘时间【1、（21:00 - 23:00) 2、(21:00 - 23:30)】：'))
+    engine = csvsLocalEngine(type, night)
     engine.startWork()
