@@ -1,26 +1,25 @@
 # -- coding: utf-8 --
 
-import pandas as pd
-import tushare as ts
-from datetime import time, timedelta
-import multiprocessing
+import pymongo
+from vnpy.trader.app.ctaStrategy.ctaBase import TICK_DB_NAME
+from datetime import datetime
 
-
-def testMulti(args):
-    print args
-    return 1
 
 if __name__ == '__main__':
-    # 多进程优化，启动一个对应CPU核心数量的进程池
-    pool = multiprocessing.Pool(multiprocessing.cpu_count())
-    l = []
+    client = pymongo.MongoClient('localhost', 27017)
+    db = client[TICK_DB_NAME]
+    collection = db['rb1805']
+    collection.create_index('datetime')
 
-    settingList = {'openLen': 2}
-    for setting in settingList:
-        l.append(pool.apply_async(testMulti, ('a')))
-    pool.close()
-    pool.join()
-
-    # 显示结果
-    resultList = [res.get() for res in l]
-    print resultList
+    # data ={'testId':2, 'testData':'a'}
+    # collection.update_many({'testId': 1}, {'$set': data}, upsert = True)
+    startDatetime = datetime.strptime('2018-03-14 22:58:23', '%Y-%m-%d %H:%M:%S')
+    endDatetime = datetime.strptime('2018-03-14 22:58:26', '%Y-%m-%d %H:%M:%S')
+    flt = {'datetime': {'$gte': startDatetime,
+                        '$lt': endDatetime}}
+    cursor = collection.find(flt)
+    cursor.skip(2)
+    index = 0
+    while index < cursor.count()-2:
+        print cursor[index]['datetime']
+        index += 1

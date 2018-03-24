@@ -21,7 +21,7 @@ AFTERNOON_END_CF = datetime.time(15, 0)
 # 商品期货夜盘时间
 NIGHT_START_CF = datetime.time(21, 0)
 NIGHT_END_CF_N = datetime.time(23, 0) # 到夜间收盘
-NIGHT_END_CF_M = datetime.time(1, 0) # 到凌晨收盘
+NIGHT_END_CF_M = datetime.time(2, 30) # 到凌晨收盘
 
 #股指期货
 MORNING_START_SF = datetime.time(9, 30)
