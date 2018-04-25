@@ -207,10 +207,10 @@ class TicksLocalEngine(object):
                 tick.symbol = code
                 tick.exchange = exchange
                 tick.vtSymbol = self.vtCode
-                tick.lastPrice = row['vol']
-                tick.lastvolume = row['oi_change']
-                tick.askPrice1 = row['vol']
-                tick.bidPrice1 = row['vol']
+                tick.lastPrice = row['price']
+                tick.lastvolume = row['vol']
+                tick.askPrice1 = row['price']
+                tick.bidPrice1 = row['price']
                 #保存tick数据到数据库
                 self.collection.update_many({'datetime':tick.datetime}, {'$set':tick.__dict__}, upsert = True)
                 loadCount += 1
