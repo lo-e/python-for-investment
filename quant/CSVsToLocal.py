@@ -190,7 +190,7 @@ class csvsLocalEngine(object):
 
     def needUpdateChecking(self, symbol, date):
         '''检查数据库该日期的tick数据是否存在'''
-         #查询数据库
+        #查询数据库
         flt = {'code':symbol}
         cursor = self.historyCollection.find(flt)
         #拿到历史记录
