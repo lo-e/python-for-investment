@@ -275,7 +275,7 @@ class csvsMainEngine(object):
                 if '\\' in root:
                     dirName = root.split('\\')[-1]
 
-                if not dirName or not dirName.endswith('00'):
+                if not dirName or (not dirName.endswith('00')) or ('index' not in root):
                     continue
 
                 if '.csv' in theFile:
@@ -363,26 +363,22 @@ class csvsMainEngine(object):
         print u'用时：', sub, 's'
 
 if __name__ == '__main__':
-    '''
+    #'''
     # 每日数据导入数据库
     engine = csvsLocalEngine()
     engine.startWork()
-    '''
-
-    #'''
+    
     # 龙虎榜数据导入
     engine = lhbLoadingEngine()
     engine.tblhbLoading()
+
+    # 主力合约整理
+    engine = csvsMainEngine()
+    engine.processIndex()
     #'''
 
     '''
     # 生成主力文件
     engine = csvsMainEngine()
     engine.createIndex()
-    '''
-
-    '''
-    # 主力合约整理
-    engine = csvsMainEngine()
-    engine.processIndex()
     '''

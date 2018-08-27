@@ -51,7 +51,7 @@ class TicksLocalEngine(object):
 
     def startWork(self):
         #获取交易日列表
-        self.requestTradingDays()
+        #self.requestTradingDays()
         #开始的日期
         date = datetime.datetime.strptime(self.startDate, '%Y-%m-%d')
         delta = timedelta(1)
@@ -164,7 +164,8 @@ class TicksLocalEngine(object):
             loadCount = 0
             for index, row in tickData.iterrows():
                 the = row['date']
-                dt = the.to_datetime()
+                #dt = the.to_datetime()
+                dt = the
                 t = dt.time()
                 #过滤无效数据
                 fakeData = True
@@ -193,7 +194,9 @@ class TicksLocalEngine(object):
                     lastDt = dt
 
                 else:
-                    mSecond += 1000
+                    mSecond += 500000
+                    if mSecond >= 1000000:
+                        mSecond = 0
 
                 dt = dt.replace(microsecond = mSecond)
 
@@ -206,7 +209,7 @@ class TicksLocalEngine(object):
     
                 tick.symbol = code
                 tick.exchange = exchange
-                tick.vtSymbol = self.vtCode
+                tick.vtSymbol = code
                 tick.lastPrice = row['price']
                 tick.lastvolume = row['vol']
                 tick.askPrice1 = row['price']
@@ -237,7 +240,7 @@ if __name__ == '__main__':
         code = 'rb1805'
         exchange = 'TS'
         asset = 1
-        startDate = '2017-05-16'
+        startDate = '2018-02-01'
         engine = TicksLocalEngine(code, exchange, asset, startDate)
         engine.startWork()
     else:

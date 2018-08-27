@@ -21,6 +21,7 @@ AFTERNOON_END_CF = datetime.time(15, 0)
 # 商品期货夜盘时间
 NIGHT_START_CF = datetime.time(21, 0)
 NIGHT_END_CF_N = datetime.time(23, 0) # 到夜间收盘
+NIGHT_END_CF_NM = datetime.time(1, 0) # 到凌晨收盘
 NIGHT_END_CF_M = datetime.time(2, 30) # 到凌晨收盘
 
 #股指期货
@@ -47,6 +48,7 @@ class csvsLocalEngine(object):
     def startWork(self):
         for root, subdirs, files in os.walk(self.walkingDir):
             for theFile in files:
+                dirName = ''
                 currentDate = None
                 currentSymbol = ''
                 count = 0
@@ -54,10 +56,15 @@ class csvsLocalEngine(object):
                 # 确定合约【由文件夹名称决定，因为主力合约只能在文件夹名称中确定】
                 if '\\' in root:
                     currentSymbol =  root.split('\\')[-1]
+                    if not currentSymbol or (not currentSymbol.endswith('00')):
+                        continue
                     currentSymbol = currentSymbol  + '.TB'
 
                 # 排除不合法文件
                 if theFile.startswith('.'):
+                    continue
+
+                if 'tick' not in root:
                     continue
 
                 # 确定日期
@@ -124,19 +131,27 @@ class csvsLocalEngine(object):
                                         or (AFTERNOON_START_CF <= t < AFTERNOON_END_CF)):
                                         fakeData = False
                                 elif self.night  ==  1:
-                                    # 夜间收盘
+                                    # 夜间23:00收盘
                                     if ((MORNING_START_CF <= t < MORNING_REST_CF)
                                         or (MORNING_RESTART_CF <= t < MORNING_END_CF)
                                         or (AFTERNOON_START_CF <= t < AFTERNOON_END_CF)
                                         or (NIGHT_START_CF <= t < NIGHT_END_CF_N)):
                                         fakeData = False
                                 elif self.night == 2:
-                                    # 凌晨收盘
+                                    # 凌晨1:00收盘
                                     if ((MORNING_START_CF <= t < MORNING_REST_CF)
                                         or (MORNING_RESTART_CF <= t < MORNING_END_CF)
                                         or (AFTERNOON_START_CF <= t < AFTERNOON_END_CF)
                                         or (NIGHT_START_CF <= t)
-                                        or (NIGHT_END_CF_M > t)):
+                                        or (NIGHT_END_CF_NM > t)):
+                                        fakeData = False
+                                elif self.night == 3:
+                                    # 凌晨2:30收盘
+                                    if ((MORNING_START_CF <= t < MORNING_REST_CF)
+                                            or (MORNING_RESTART_CF <= t < MORNING_END_CF)
+                                            or (AFTERNOON_START_CF <= t < AFTERNOON_END_CF)
+                                            or (NIGHT_START_CF <= t)
+                                            or (NIGHT_END_CF_M > t)):
                                         fakeData = False
 
                             elif self.dataType == 2:
@@ -231,13 +246,13 @@ class csvsLocalEngine(object):
 
 if __name__ == '__main__':
     type = int(raw_input(u'合约类型【1、商品 2、股指】：'))
-    if type != 1 and type != 2:
+    if type != 1 and type != 2 :
         print '输入有误'
         exit(0)
 
     if type == 1:
-        night = int(raw_input(u'夜盘时间类型【0、无 1、夜间 2、凌晨】：'))
-        if night != 0 and night != 1 and night != 2:
+        night = int(raw_input(u'夜盘时间类型【0、无 1、夜间23:00 2、凌晨1:00 3、凌晨2:30】：'))
+        if night != 0 and night != 1 and night != 2 and night != 3:
             print '输入有误'
             exit(0)
     engine = csvsLocalEngine(type, night)

@@ -30,7 +30,7 @@ def backtesting(symbol, dateFrom, dateTo, size, stopPercent, isMulti):
     count = 0
 
     asset = 100000  #资金
-    lever = 2       #杠杆
+    lever = 5       #杠杆
     lastMonth = ''
     monthEarn = 0
     monthGainCount = 0
@@ -285,7 +285,7 @@ def backtesting(symbol, dateFrom, dateTo, size, stopPercent, isMulti):
         df['earn'].plot()
         plt.show()
 
-if __name__ == '__main__':
+def startDailyBacktesting():
     symbol = raw_input(u'合约代码：')
     someDate = raw_input(u'是否指定日期（1.是 2.否）：')
     dateFrom = ''
@@ -317,3 +317,5 @@ if __name__ == '__main__':
     else:
         backtesting(symbol, dateFrom, dateTo, size, 0, False)
 
+if __name__ == '__main__':
+    startDailyBacktesting()
