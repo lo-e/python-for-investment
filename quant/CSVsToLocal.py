@@ -91,6 +91,7 @@ class csvsLocalEngine(object):
                         reader = csv.DictReader(f)
                         # 开始导入数据
                         startTime = time()
+
                         for row in reader:
                             count += 1
                             if count == 1:
@@ -182,17 +183,18 @@ class csvsLocalEngine(object):
                             tick = VtTickData()
                             tick.vtSymbol = row['instrument']
                             tick.lastPrice = float(row['lastp'])
-                            tick.volume = int(row['volume'])
-                            tick.openInterest = int(row['openinterest'])
+                            tick.volume = int(float(row['volume']))
+                            tick.openInterest = int(float(row['openinterest']))
                             tick.askPrice1 = float(row['ask1'])
-                            tick.askVolume1 = int(row['asksz1'])
+                            tick.askVolume1 = int(float(row['asksz1']))
                             tick.bidPrice1 = float(row['bid1'])
-                            tick.bidVolume1 = int(row['bidsz1'])
+                            tick.bidVolume1 = int(float(row['bidsz1']))
                             tick.date = theDate
                             tick.time = theTime
                             tick.datetime = theDatetime
                             # 保存tick到数据库
                             collection.update_many({'datetime': tick.datetime}, {'$set': tick.__dict__}, upsert = True)
+
                         # 打印进程
                         if count:
                             sub = time() - startTime
