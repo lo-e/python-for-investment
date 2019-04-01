@@ -8,14 +8,13 @@ import os
 from datetime import datetime
 from time import time
 import re
+import pymongo
 
-symbolDict  = {'RB':'rb'}
+symbolDict  = {'RB':'rb',
+               'ZN':'zn'}
 
-#账号密码
 userName = "license"
-password = "OZfNj71Cb6i-eXwOZzuSdHK-U23E1-irpH4EBPwf_RqIgY0-vka35iYmjBot1i2W9eJ4xiZWtrNpxsvy_iY3Il2_YkNjNzW9TVUuFWNp0QNKe0qgO1CSSYDe5uD9ajcN5J7rNtxdagH4Rmfiuv_gHc5bdxxXCnjRH2vZ8JSb2wE=TQFXjsEHPXK2rGTBE1nlgn-BlbI2IvHZmfFsM8tw3jZYATwcUvnXCCGATnAKLIBRnSc1JYVhfm1CUyRdam0vrWeUgebLaPT1rJiXkdQT2WUTwNIB3AY-TVKJciNZzGw0glt02EZXYvYPVlgiqefYVNkLEJ3EApj4i5wsd5C9J48="
-
-#初始化
+password ="RB9_lNZyjef4jr5anBDCt-R2zlx6_yxmNx2yGThJxkcZ_R9wB2h7r_hna6QkJYGQ3n1gREv1_j1EfKO5YaomPw0j83FvHnHYDflE9smrQRPBDlTu4UhqDSvOFlBCeFzj_XFKygo9PG1o--EFuSkaGyCyEo1GGwzd3ONHee5QsgA=OvTGlsECDj3u0wkwuQI8gHL4vYB0znxnf25rjJxUnUrkJN9wHwm5GKhqO2mekFU6n3vTPVtqKJ2cn8avt7FM2ITYgG1UOnkaFP5Q5jqYm8_AQh-hSIB9nsmc_i4gqqeBDfiObo9HoJAwC8Z6mWFDvN5F7eW2TrtWXq3aRewEHwU="
 rq.init(userName, password)
 
 class RQDataService(object):
@@ -168,8 +167,7 @@ class RQDataService(object):
         else:
             return rqSymbol
 
-
-
 if __name__ == '__main__':
-    dtService = RQDataService()
-    dtService.fetchDominantTickToCSVs('RB', '2019-1-23', '2019-1-24')
+    service = RQDataService()
+    service.fetchDominantTickToCSVs('J', startDate='2019-04-1', endDate='2019-04-1')
+    print ''

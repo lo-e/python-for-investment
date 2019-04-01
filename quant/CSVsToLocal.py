@@ -58,7 +58,6 @@ class csvsLocalEngine(object):
                     currentSymbol =  root.split('\\')[-1]
                     if not currentSymbol or (not currentSymbol.endswith('00')):
                         continue
-                    currentSymbol = currentSymbol  + '.TB'
 
                 # 排除不合法文件
                 if theFile.startswith('.'):
@@ -252,6 +251,7 @@ if __name__ == '__main__':
         print '输入有误'
         exit(0)
 
+    night = 0
     if type == 1:
         night = int(raw_input(u'夜盘时间类型【0、无 1、夜间23:00 2、凌晨1:00 3、凌晨2:30】：'))
         if night != 0 and night != 1 and night != 2 and night != 3:
