@@ -14,7 +14,10 @@ import re
 
 userName = "license"
 password = "dz9o6-SYOXqaZEoz-qUx3inb0RhitYeagYoXiwOZJjYUfHjLtQeDaopppzc1zc6K84mRGSvmlVTwOIRZ9PORzzjXhcOdlrNjD35rMZos_PtZ21RwzJWCBheJ54tvdITXDacYtBceJ1Vub7RBGmKtuQ4DCikErdOiHmpS094_0DA=HnHwvv5WoTaqyELbhBADe_6_ecoQRwWzJA6OSZmkwWPwEXHpK0ygv0nhoh_Gu07cx6QHcYvi-luA1L0pZE96B4fLIbeyTxUow-UsAt6MRZOSly89nOfhUa08bb1nE-UmcKklWn6crSXwsnxhC8vKW-FlGiM4jfIkXgWtsgZpgJA="
-rq.init(userName, password)
+try:
+    rq.init(userName, password)
+except:
+    rq.init()
 
 def isFinanceSymbol(symbol):
     financeSymbols = ['IF', 'IC', 'IH']
