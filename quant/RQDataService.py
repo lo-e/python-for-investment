@@ -15,7 +15,10 @@ symbolDict  = {'RB':'rb',
 
 userName = "license"
 password ="RB9_lNZyjef4jr5anBDCt-R2zlx6_yxmNx2yGThJxkcZ_R9wB2h7r_hna6QkJYGQ3n1gREv1_j1EfKO5YaomPw0j83FvHnHYDflE9smrQRPBDlTu4UhqDSvOFlBCeFzj_XFKygo9PG1o--EFuSkaGyCyEo1GGwzd3ONHee5QsgA=OvTGlsECDj3u0wkwuQI8gHL4vYB0znxnf25rjJxUnUrkJN9wHwm5GKhqO2mekFU6n3vTPVtqKJ2cn8avt7FM2ITYgG1UOnkaFP5Q5jqYm8_AQh-hSIB9nsmc_i4gqqeBDfiObo9HoJAwC8Z6mWFDvN5F7eW2TrtWXq3aRewEHwU="
-rq.init(userName, password)
+try:
+    rq.init(userName, password)
+except:
+    rq.init()
 
 class RQDataService(object):
     def __init__(self):
