@@ -14,11 +14,13 @@ symbolDict  = {'RB':'rb',
                'ZN':'zn'}
 
 userName = "license"
-password ="RB9_lNZyjef4jr5anBDCt-R2zlx6_yxmNx2yGThJxkcZ_R9wB2h7r_hna6QkJYGQ3n1gREv1_j1EfKO5YaomPw0j83FvHnHYDflE9smrQRPBDlTu4UhqDSvOFlBCeFzj_XFKygo9PG1o--EFuSkaGyCyEo1GGwzd3ONHee5QsgA=OvTGlsECDj3u0wkwuQI8gHL4vYB0znxnf25rjJxUnUrkJN9wHwm5GKhqO2mekFU6n3vTPVtqKJ2cn8avt7FM2ITYgG1UOnkaFP5Q5jqYm8_AQh-hSIB9nsmc_i4gqqeBDfiObo9HoJAwC8Z6mWFDvN5F7eW2TrtWXq3aRewEHwU="
+password = "aZHtZE1qYOWnB-6KktQtJohPX3WKC36AsTpTd0rahHMYiSpnx6xDwrasA_T627gyT03kYNr0IfmoYvv4mWvdJ0YiWP5Kjg4inkHF2M9LQFz1YJhQHhYfaWRT20IBMwAjTnY3ahUloD0XpcYvo3uM_6Pxf154FyRziYpjYmu8EoM=hc_L4J_ks5S_mLGW-uuhjTlht2txxX0lHyyXeG_35kG5Gngu2EpesZMVAzvLQEJGUKF-4pfODArGsbjbv9L_cOdCQIp68fGSnsd2MTkO9FSD6z8dBpJk46nQ382TfoLJTeq1VRtagkCZrfIsTf3gJahaAQ5xIRCrbB8qtXT9n1Q="
+
 try:
     rq.init(userName, password)
 except:
     rq.init()
+
 
 class RQDataService(object):
     def __init__(self):
@@ -172,5 +174,5 @@ class RQDataService(object):
 
 if __name__ == '__main__':
     service = RQDataService()
-    service.fetchDominantTickToCSVs('SM', startDate='2019-04-1', endDate='2019-04-1')
+    service.fetchDominantTickToCSVs('TA', startDate='2019-5-6', endDate='2019-5-6')
     print ''
