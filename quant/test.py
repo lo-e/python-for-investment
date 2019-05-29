@@ -17,7 +17,7 @@ import pandas as pd
 class SliceIdGenerator:
     """slice id生成器"""
     def __init__(self):
-        self.__ch = 'aaaaaaaaa`'
+        self.__ch = 'aaaaaaaaa'
 
     def getNextSliceId(self):
         ch = self.__ch
@@ -35,10 +35,8 @@ class SliceIdGenerator:
 
 
 if __name__ == '__main__':
-    generator = SliceIdGenerator();
-    i = 0
-    while i < 10:
-        ch = generator.getNextSliceId()
-        print ch
-        i += 1
+    a = 'rb1905'
+    startSymbol = re.sub("\d", "", a)
+    print startSymbol
+
 
