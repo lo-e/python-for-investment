@@ -174,5 +174,5 @@ class RQDataService(object):
 
 if __name__ == '__main__':
     service = RQDataService()
-    service.fetchDominantTickToCSVs('TA', startDate='2019-5-6', endDate='2019-5-6')
+    service.fetchDominantTickToCSVs('SM', startDate='2019-6-6', endDate='2019-6-6')
     print ''
