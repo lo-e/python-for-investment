@@ -8,8 +8,8 @@ import os
 import csv
 
 main_url = 'https://hist-quote.1tokentrade.cn'
-#ot_key = 'JfmGSuv1-59r7T9m4-pHPLO63T-BflOru2o' # loe
-ot_key = 'sMJ9QjMU-dYMSKcLu-j05hIU8h-StjPWIEA' # szxbh 18116350794
+ot_key = 'JfmGSuv1-59r7T9m4-pHPLO63T-BflOru2o' # loe
+#ot_key = 'sMJ9QjMU-dYMSKcLu-j05hIU8h-StjPWIEA' # szxbh 18116350794
 
 # ====== 获取支持的合约列表 ======
 # date：'YYYY-MM-DD'
@@ -113,15 +113,16 @@ if __name__ == '__main__':
     get_contracts_list(date)
     """
 
-    """
+    #"""
     # 获取bar数据
-    contract = 'huobif/eos.usd.q'
-    since = '2018-12-01'
-    until = '2019-01-01'
+    contract = 'huobif/btc.usd.n'
+    start_month = 4
+    since = f'2019-0{start_month}-01'
+    until = f'2019-0{start_month+1}-01'
     duration = '5m'
 
     get_bar_data(contract=contract, since=since, until=until, duration=duration)
-    """
+    #"""
 
     """
     # 获取tick数据
@@ -131,9 +132,9 @@ if __name__ == '__main__':
     get_tick_data(data_type=data_type, contract=contract, date=date)
     """
 
-    #"""
+    """
     # 查询具体交易对数据的起始时间
-    contract = 'huobif/btc.usd.q'
+    contract = 'huobif/btc.usd.n'
     duration = '5m'
     get_contract_since(contract=contract, duration=duration)
-    #"""
+    """
