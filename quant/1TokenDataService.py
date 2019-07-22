@@ -113,16 +113,16 @@ if __name__ == '__main__':
     get_contracts_list(date)
     """
 
-    #"""
+    """
     # 获取bar数据
-    contract = 'huobif/btc.usd.n'
+    contract = 'huobif/eos.usd.q'
     start_month = 4
     since = f'2019-0{start_month}-01'
     until = f'2019-0{start_month+1}-01'
-    duration = '5m'
+    duration = '1d'
 
     get_bar_data(contract=contract, since=since, until=until, duration=duration)
-    #"""
+    """
 
     """
     # 获取tick数据
@@ -132,9 +132,9 @@ if __name__ == '__main__':
     get_tick_data(data_type=data_type, contract=contract, date=date)
     """
 
-    """
+    #"""
     # 查询具体交易对数据的起始时间
-    contract = 'huobif/btc.usd.n'
+    contract = 'huobip/eos.usdt'
     duration = '5m'
     get_contract_since(contract=contract, duration=duration)
-    """
+    #"""
