@@ -3,7 +3,7 @@
 import pymongo
 import datetime
 from vnpy.trader.object import TickData, BarData
-from vnpy.app.cta_strategy.base import TICK_DB_NAME, DAILY_DB_NAME, MINUTE_DB_NAME, MinuteDataBaseName
+from vnpy.app.cta_strategy.base import TICK_DB_NAME, DAILY_DB_NAME, MinuteDataBaseName, HourDataBaseName
 import os
 import csv
 from time import time
@@ -366,12 +366,16 @@ class CSVsCryptocompareBarLocalEngine(object):
                 if '\\' in root:
                     dirName = root.split('\\')[-1]
 
-                if '.csv' in theFile and dirName == self.duration:
+                d = re.sub("\d", "", self.duration)
+                if '.csv' in theFile and (d in dirName):
                     if dirName == '1d':
                         db_name = DAILY_DB_NAME
-                    elif dirName == '1m' or dirName == '5m' or dirName == '15m' or dirName == '30m':
-                        duration = re.sub("\D", "", dirName)
+                    elif dirName == '1m':
+                        duration = re.sub("\D", "", self.duration)
                         db_name = MinuteDataBaseName(duration)
+                    elif dirName == '1h':
+                        duration = re.sub("\D", "", self.duration)
+                        db_name = HourDataBaseName(duration)
                     else:
                         print('输入的周期不正确！！')
                         exit(0)
@@ -380,6 +384,10 @@ class CSVsCryptocompareBarLocalEngine(object):
                     filePath = root + '\\' + theFile
                     with open(filePath, 'r') as f:
                         reader = csv.DictReader(f)
+                        self.bar = None
+                        self.startHour = 0
+                        self.nextHour = 0
+                        self.durationStart = False
                         # 开始导入数据
                         for row in reader:
                             # 合约
@@ -409,14 +417,38 @@ class CSVsCryptocompareBarLocalEngine(object):
                             collection = self.bar_db[symbol]
                             collection.create_index('datetime')
                             # 创建BarData对象
-                            bar = BarData(gateway_name='', symbol=symbol, exchange=None, datetime=theDatetime, endDatetime=None)
-                            bar.open_price = float(row['open'])
-                            bar.close_price = float(row['close'])
-                            bar.high_price = float(row['high'])
-                            bar.low_price = float(row['low'])
-                            bar.volume = float(row['volumeto'])
-                            # 保存bar到数据库
-                            collection.update_many({'datetime': bar.datetime}, {'$set': bar.__dict__}, upsert = True)
+                            if 'h' in self.duration:
+                                # 小时K
+                                h = theDatetime.hour
+                                if h == self.nextHour:
+                                    self.durationStart = True
+                                    self.nextHour += 1
+                                    if self.nextHour >= 24:
+                                        self.nextHour = 0
+                                elif self.durationStart:
+                                    print(f'小时K数据缺失\t{theDatetime}')
+                                    exit(0)
+                                else:
+                                    continue
+
+                            if not self.bar:
+                                self.startHour += int(re.sub("\D", "", self.duration))
+                                if self.startHour >= 24:
+                                    self.startHour = 0
+
+                                self.bar = BarData(gateway_name='', symbol=symbol, exchange=None, datetime=theDatetime, endDatetime=None)
+                                self.bar.open_price = float(row['open'])
+                                self.bar.close_price = float(row['close'])
+                                self.bar.high_price = float(row['high'])
+                                self.bar.low_price = float(row['low'])
+                            self.bar.close_price = float(row['close'])
+                            self.bar.high_price = max(self.bar.high_price, float(row['high']))
+                            self.bar.low_price = min(self.bar.low_price, float(row['low']))
+                            self.bar.volume = float(row['volumeto'])
+                            if ('h' in self.duration and self.nextHour == self.startHour) or ('d' in self.duration):
+                                # 保存bar到数据库
+                                collection.update_many({'datetime': self.bar.datetime}, {'$set': self.bar.__dict__}, upsert = True)
+                                self.bar = None
                 # 打印进程
                 if count:
                     sub = time() - startTime

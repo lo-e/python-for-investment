@@ -11,11 +11,12 @@ URL_PRICE_MULTI = 'https://min-api.cryptocompare.com/data/pricemulti?fsyms={}&ts
 URL_PRICE_MULTI_FULL = 'https://min-api.cryptocompare.com/data/pricemultifull?fsyms={}&tsyms={}'
 URL_HIST_PRICE = 'https://min-api.cryptocompare.com/data/pricehistorical?fsym={}&tsyms={}&ts={}&e={}'
 URL_HIST_PRICE_DAY = 'https://min-api.cryptocompare.com/data/histoday?fsym={}&tsym={}&limit={}'
-
 """ modify by loe """
-URL_HIST_PRICE_DAY_WITH_EXCHANGE = 'https://min-api.cryptocompare.com/data/histoday?fsym={}&tsym={}&limit={}&e={}'
+URL_HIST_PRICE_DAY_WITH_EXCHANGE = 'https://min-api.cryptocompare.com/data/histoday?fsym={}&tsym={}&limit={}&toTs={}&e={}'
 
 URL_HIST_PRICE_HOUR = 'https://min-api.cryptocompare.com/data/histohour?fsym={}&tsym={}&limit={}'
+""" modify by loe """
+URL_HIST_PRICE_HOUR_WITH_EXCHANGE = 'https://min-api.cryptocompare.com/data/histohour?fsym={}&tsym={}&limit={}&toTs={}&e={}'
 URL_HIST_PRICE_MINUTE = 'https://min-api.cryptocompare.com/data/histominute?fsym={}&tsym={}&limit={}'
 URL_AVG = 'https://min-api.cryptocompare.com/data/generateAvg?fsym={}&tsym={}&e={}'
 URL_EXCHANGES = 'https://www.cryptocompare.com/api/data/exchanges'
@@ -81,11 +82,17 @@ def get_historical_price_day(coin, curr=CURR, limit=LIMIT):
     return query_cryptocompare(URL_HIST_PRICE_DAY.format(coin, format_parameter(curr), limit))
 
 """ modify by loe """
-def get_historical_price_day_with_exchange(coin, curr=CURR, limit=LIMIT, exchange='CCCAGG'):
-    return query_cryptocompare(URL_HIST_PRICE_DAY_WITH_EXCHANGE.format(coin, format_parameter(curr), limit, exchange))
+def get_historical_price_day_with_exchange(coin, curr=CURR, limit=LIMIT, toDatatime='', exchange='CCCAGG'):
+    toTimestamp = timestampFromStr(datetimeStr=toDatatime)
+    return query_cryptocompare(URL_HIST_PRICE_DAY_WITH_EXCHANGE.format(coin, format_parameter(curr), limit, toTimestamp, exchange))
 
 def get_historical_price_hour(coin, curr=CURR, limit=LIMIT):
     return query_cryptocompare(URL_HIST_PRICE_HOUR.format(coin, format_parameter(curr), limit))
+
+""" modify by loe """
+def get_historical_price_hour_with_exchange(coin, curr=CURR, limit=LIMIT, toDatatime='', exchange='CCCAGG'):
+    toTimestamp = timestampFromStr(datetimeStr=toDatatime)
+    return query_cryptocompare(URL_HIST_PRICE_HOUR_WITH_EXCHANGE.format(coin, format_parameter(curr), limit, toTimestamp, exchange))
 
 def get_historical_price_minute(coin, curr=CURR, limit=LIMIT):
     return query_cryptocompare(URL_HIST_PRICE_MINUTE.format(coin, format_parameter(curr), limit))
@@ -99,6 +106,13 @@ def get_exchanges():
     response = query_cryptocompare(URL_EXCHANGES)
     if response:
         return response['Data']
+
+def timestampFromStr(datetimeStr):
+    if not datetimeStr:
+        return int(time.time())
+
+    toDatatime = datetime.datetime.strptime(datetimeStr, '%Y-%m-%d %H:%M:%S')
+    return int(toDatatime.timestamp())
 
 """
 print('================== COIN LIST =====================')
@@ -149,12 +163,19 @@ print(cryptocompare.get_exchanges())
 
 # ======= cryptocompareDataService ======
 # 下载bar数据
-def get_bar_data(coin:str, curr:str, limit:int, exchange:str, duration:str):
+def get_bar_data(coin:str, curr:str, limit:int, exchange:str, duration:str, toDatetime=''):
     contract = f'{exchange}/{coin}.{curr}'
 
     result = None
     if duration == '1d':
-        result = get_historical_price_day_with_exchange(coin, curr=curr, limit=limit, exchange=exchange)
+        # 日K
+        result = get_historical_price_day_with_exchange(coin, curr=curr, limit=limit, toDatatime=toDatetime, exchange=exchange)
+
+    if 'h' in duration:
+        # 小时K
+        nextHour = -1
+        result = get_historical_price_hour_with_exchange(coin, curr=curr, limit=limit, toDatatime=toDatetime, exchange=exchange)
+
     if not result:
         return
 
@@ -169,7 +190,19 @@ def get_bar_data(coin:str, curr:str, limit:int, exchange:str, duration:str):
 
         # 转换时间戳
         timestamp = dic['time']
-        datetime_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(timestamp))
+        #dt = time.localtime(timestamp)
+        dt = datetime.datetime.fromtimestamp(timestamp)
+        datetime_str = datetime.datetime.strftime(dt, "%Y-%m-%d %H:%M:%S")
+        if 'h' in duration:
+            # 小时K做一个数据缺漏检查
+            hour = dt.hour
+            if hour != nextHour and nextHour >= 0:
+                print(f'小时K数据缺失{dt}')
+                exit(0)
+            nextHour = hour + 1
+            if nextHour == 24:
+                nextHour = 0
+
         dic.pop('time')
         dic['datetime'] = datetime_str
         dic['symbol'] = contract
@@ -195,7 +228,58 @@ def get_bar_data(coin:str, curr:str, limit:int, exchange:str, duration:str):
         writer.writerows(result_list)
 if __name__ == '__main__':
     # 下载日线数据
-    get_bar_data('EOS', curr='USDT', limit=2000, exchange='OKEX', duration='1d')
+    """
+    toDatetime = '2016-12-01 00:00:00'
+    toDatetime = ''
+    get_bar_data('ETH', curr='USDT', limit=2000, toDatetime=toDatetime, exchange='Poloniex', duration='1d')
+    """
 
-    #print(get_historical_price_day_with_exchange('BTC', curr='USDT', limit=2000, exchange='OKEX'))
+    # 下载小时数据
+    """
+    year = 2018
+    month = 0
+    while month < datetime.datetime.now().month or year < datetime.datetime.now().year:
+        month += 2
+        if month > 12:
+            year += 1
+            month = 2
+        toDatetime = f'{year}-{month}-01 00:00:00'
+        print(f'小时K\t{toDatetime}')
+        get_bar_data('ETH', curr='USDT', limit=2000, toDatetime=toDatetime, exchange='OKEX', duration='1h')
+    """
+
+    # 获取交易所
+    """
+    data = get_exchanges()
+    exchanges = data.keys()
+    for ex in exchanges:
+        print(ex)
+    """
+
+    # 筛选有数据的交易所
+    #"""
+    datetimeStr = '2016-12-01 10:00:00'
+    exData = get_exchanges()
+    exchanges = exData.keys()
+    for exchange in exchanges:
+        print(exchange)
+        #response = get_historical_price_hour_with_exchange('BTC', curr='USDT', limit=1, toDatatime=datetimeStr, exchange=exchange)
+        response = get_historical_price_day_with_exchange('EOS', curr='USDT', limit=1, toDatatime=datetimeStr, exchange=exchange)
+        if response:
+            priceData = response['Data']
+            firstClose = priceData[0]['close']
+            if firstClose:
+                print(f'****** {exchange}\t{firstClose} ******')
+        print('\n')
+    #"""
+
+    # 获取最新价格
     #print(get_historical_price('BTC', 'USDT', datetime.datetime.now(), exchange='OKEX'))
+
+    # 获取日K数据 【from 2017-12-01 8:00:00】
+    #datetimeStr = '2016-12-01 08:00:00'
+    #print(get_historical_price_day_with_exchange('EOS', curr='USDT', limit=1, toDatatime=datetimeStr, exchange='Poloniex'))
+
+    # 获取小时K数据 【from 2017-12-01 22:00:00】
+    #datetimeStr = '2015-12-01 10:00:00'
+    #print(get_historical_price_hour_with_exchange('BTC', curr='USDT', limit=1, toDatatime=datetimeStr, exchange='Poloniex'))

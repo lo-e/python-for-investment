@@ -1,25 +1,21 @@
 #-- coding: utf-8 --
 
-import rqdatac as rq
-from rqdatac import *
 import pandas as pd
-from vnpy.trader.vtObject import VtTickData
+from vnpy.trader.object import TickData
 import os
 from datetime import datetime
 from time import time
 import re
 import pymongo
 
+import rqdatac as rq
+from rqdatac import *
+rq.init()
+
 symbolDict  = {'RB':'rb',
+               'HC':'hc',
+               'J':'j',
                'ZN':'zn'}
-
-userName = "license"
-password = "aZHtZE1qYOWnB-6KktQtJohPX3WKC36AsTpTd0rahHMYiSpnx6xDwrasA_T627gyT03kYNr0IfmoYvv4mWvdJ0YiWP5Kjg4inkHF2M9LQFz1YJhQHhYfaWRT20IBMwAjTnY3ahUloD0XpcYvo3uM_6Pxf154FyRziYpjYmu8EoM=hc_L4J_ks5S_mLGW-uuhjTlht2txxX0lHyyXeG_35kG5Gngu2EpesZMVAzvLQEJGUKF-4pfODArGsbjbv9L_cOdCQIp68fGSnsd2MTkO9FSD6z8dBpJk46nQ382TfoLJTeq1VRtagkCZrfIsTf3gJahaAQ5xIRCrbB8qtXT9n1Q="
-
-try:
-    rq.init(userName, password)
-except:
-    rq.init()
 
 
 class RQDataService(object):
@@ -31,7 +27,7 @@ class RQDataService(object):
         # 获取主力合约列表
         dominantList = get_dominant_future(underlyingSymbol, start_date=startDate, end_date=endDate, rule=0)
         if not isinstance(dominantList, pd.Series):
-            print '该品种没有上市合约'
+            print('该品种没有上市合约')
             return
 
         i = 0
@@ -46,7 +42,7 @@ class RQDataService(object):
             dt = index.to_pydatetime()
             count = 0
             startTime = time()
-            print '=' * 6, vtSymbol, ' ', dt.date(), '=' * 6
+            print('=' * 6, vtSymbol, ' ', dt.date(), '=' * 6)
             #获取tick
             tickData = rq.get_price(rqSymbol, dt.strftime('%Y-%m-%d'), dt.strftime('%Y-%m-%d'),'tick')
             isDf = isinstance(tickData, pd.DataFrame)
@@ -135,8 +131,8 @@ class RQDataService(object):
 
                 # 打印进程
                 sub = time() - startTime
-                print u'用时：', sub, 's'
-                print u'数据量：', count, '\n'
+                print('用时：', sub, 's')
+                print('数据量：', count, '\n')
                 '''
                 for index, row in tickData.iterrows():
                     dt = index.to_datetime()
@@ -174,5 +170,5 @@ class RQDataService(object):
 
 if __name__ == '__main__':
     service = RQDataService()
-    service.fetchDominantTickToCSVs('SM', startDate='2019-6-6', endDate='2019-6-6')
-    print ''
+    service.fetchDominantTickToCSVs('RB', startDate='2019-8-7', endDate='2019-8-7')
+    print('')
