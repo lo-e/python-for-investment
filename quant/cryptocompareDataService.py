@@ -208,6 +208,9 @@ def get_bar_data(coin:str, curr:str, limit:int, exchange:str, duration:str, toDa
         dic['symbol'] = contract
         result_list.append(dic)
 
+    if not len(result_list):
+        return
+
     # 写入csv
     contract = contract.replace('/', '.')
     path = os.getcwd() + f'\\CSVs\\cryptocompare\\{contract}\\{duration}\\'
@@ -231,8 +234,10 @@ if __name__ == '__main__':
     #"""
     toDatetime = '2016-12-01 00:00:00'
     toDatetime = ''
-    symbols = ['BTC', 'ETH', 'EOS']
+    symbols = ['BTC', 'ETH', 'EOS', 'LTC', 'XRP']
     exchanges = ['OKEX', 'Poloniex']
+    symbols = ['BTC']
+    exchanges = ['OKEX']
     for s in symbols:
         for e in exchanges:
             print(f'{s}\t{e}')
