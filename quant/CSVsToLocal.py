@@ -334,6 +334,7 @@ class CSVs1TokenBarLocalEngine(object):
                     sub = time() - startTime
                     print('用时：', sub, 's')
                     print('数据量：', count, '\n')
+                    """ fake """
                     if count < 1440:
                         print('*'*60)
 

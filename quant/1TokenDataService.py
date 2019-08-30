@@ -8,11 +8,11 @@ import os
 import csv
 
 main_url = 'https://hist-quote.1tokentrade.cn'
-#ot_key = 'JfmGSuv1-59r7T9m4-pHPLO63T-BflOru2o' # loe
+ot_key = 'JfmGSuv1-59r7T9m4-pHPLO63T-BflOru2o' # loe
 #ot_key = 'sMJ9QjMU-dYMSKcLu-j05hIU8h-StjPWIEA' # szxbh 18116350794
 #ot_key = 'i9XIu2q9-aAOSuHVC-9HyL8fuq-Wdc3JPEv'  # token8122 17174208122
 #ot_key = 'Hx4oGmxw-qjywlk6f-QYqAjw4c-g6SN7X03'  # token8121 17174208118
-ot_key = 'LSjHuwNb-f1B6uafF-omcbhq6d-4NdFNp1n'  # token8117 17174208117
+#ot_key = 'LSjHuwNb-f1B6uafF-omcbhq6d-4NdFNp1n'  # token8117 17174208117
 
 # ====== 获取支持的合约列表 ======
 # date：'YYYY-MM-DD'
@@ -123,8 +123,8 @@ if __name__ == '__main__':
     # 获取bar数据
     contract = 'okef/btc.usd.q'
     duration = '1m'
-    since = datetime(2019, 1, 1)
-    until = datetime(2019, 4, 1)
+    since = datetime(2019, 8, 28)
+    until = datetime(2019, 8, 30)
     while since <= until:
         get_bar_data(contract=contract, since=datetime.strftime(since, '%Y-%m-%d'), until=datetime.strftime(since + timedelta(1), '%Y-%m-%d'), duration=duration)
         since += timedelta(1)
