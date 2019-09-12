@@ -336,7 +336,7 @@ class CSVs1TokenBarLocalEngine(object):
                     print('数据量：', count, '\n')
                     """ fake """
                     if count < 1440:
-                        print('*'*60)
+                        print('*'*60, '\n')
 
         # 打印进程
         print('所有数据导入完成')
@@ -488,14 +488,14 @@ if __name__ == '__main__':
     engine.startWork()
     """
 
-    #"""
+    """
     # 1Token_Bar
     engine = CSVs1TokenBarLocalEngine(duration='1m')
     engine.startWork()
-    #"""
-
     """
+
+    #"""
     # Cryptocompare_Bar
     engine = CSVsCryptocompareBarLocalEngine(duration='1d')
     engine.startWork()
-    """
+    #"""
