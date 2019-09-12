@@ -310,8 +310,13 @@ class CSVs1TokenBarLocalEngine(object):
                             count += 1
                             totalCount += 1
                             if count == 1:
-                                print('=' * 6, symbol, '=' * 6)
+                                print('=' * 6, symbol, '\t', theFile, '=' * 6)
 
+                            # 转换symbol
+                            symbolElements = symbol.split('/')
+                            if len(symbolElements) < 2:
+                                exit(0)
+                            symbol = symbolElements[1].upper() + '.' + symbolElements[0].upper()
                             # 数据库collection
                             collection = self.bar_db[symbol]
                             collection.create_index('datetime')
@@ -329,6 +334,9 @@ class CSVs1TokenBarLocalEngine(object):
                     sub = time() - startTime
                     print('用时：', sub, 's')
                     print('数据量：', count, '\n')
+                    """ fake """
+                    if count < 1440:
+                        print('*'*60)
 
         # 打印进程
         print('所有数据导入完成')
@@ -480,12 +488,14 @@ if __name__ == '__main__':
     engine.startWork()
     """
 
-    """
+    #"""
     # 1Token_Bar
-    engine = CSVs1TokenBarLocalEngine(duration='1d')
+    engine = CSVs1TokenBarLocalEngine(duration='1m')
     engine.startWork()
-    """
+    #"""
 
+    """
     # Cryptocompare_Bar
     engine = CSVsCryptocompareBarLocalEngine(duration='1d')
     engine.startWork()
+    """

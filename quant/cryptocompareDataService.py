@@ -208,6 +208,9 @@ def get_bar_data(coin:str, curr:str, limit:int, exchange:str, duration:str, toDa
         dic['symbol'] = contract
         result_list.append(dic)
 
+    if not len(result_list):
+        return
+
     # 写入csv
     contract = contract.replace('/', '.')
     path = os.getcwd() + f'\\CSVs\\cryptocompare\\{contract}\\{duration}\\'
@@ -228,11 +231,18 @@ def get_bar_data(coin:str, curr:str, limit:int, exchange:str, duration:str, toDa
         writer.writerows(result_list)
 if __name__ == '__main__':
     # 下载日线数据
-    """
+    #"""
     toDatetime = '2016-12-01 00:00:00'
     toDatetime = ''
-    get_bar_data('ETH', curr='USDT', limit=2000, toDatetime=toDatetime, exchange='Poloniex', duration='1d')
-    """
+    symbols = ['BTC', 'ETH', 'EOS', 'LTC', 'XRP']
+    exchanges = ['OKEX', 'Poloniex']
+    symbols = ['BTC']
+    exchanges = ['OKEX']
+    for s in symbols:
+        for e in exchanges:
+            print(f'{s}\t{e}')
+            get_bar_data(coin=s, curr='USDT', limit=2000, toDatetime=toDatetime, exchange=e, duration='1d')
+    #"""
 
     # 下载小时数据
     """
@@ -257,7 +267,7 @@ if __name__ == '__main__':
     """
 
     # 筛选有数据的交易所
-    #"""
+    """
     datetimeStr = '2016-12-01 10:00:00'
     exData = get_exchanges()
     exchanges = exData.keys()
@@ -271,7 +281,7 @@ if __name__ == '__main__':
             if firstClose:
                 print(f'****** {exchange}\t{firstClose} ******')
         print('\n')
-    #"""
+    """
 
     # 获取最新价格
     #print(get_historical_price('BTC', 'USDT', datetime.datetime.now(), exchange='OKEX'))
