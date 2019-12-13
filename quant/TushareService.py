@@ -150,7 +150,7 @@ def downloadDailyData(ts_code:str, start:str, end:str, to_database:bool=False) -
     else:
         exit(0)
 
-    df = pro.fut_daily(ts_code=ts_code, start_date=start, end_date=end)
+    df = pro.fut_daily(ts_code=ts_code, start_date=start, end_date=end).sort_values(by="trade_date", ascending=True)
     bar_list = []
     date_from = None
     date_to = None
@@ -321,6 +321,7 @@ if __name__ == '__main__':
         print('\n')
     """
 
+    """
     # 查询数据库
     underlying_symbol = 'RB'
     today = datetime.now()
@@ -340,4 +341,8 @@ if __name__ == '__main__':
         ts_code = trasform_tscode(symbol=symbol)
         bar_list, msg = downloadDailyData(ts_code=ts_code, start=start, end=end)
         print(msg)
+    """
+
+    bar_list, msg = downloadDailyData(ts_code='RB2005.SHF', start='20191210', end='20191213')
+    print(msg)
 
