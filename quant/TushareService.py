@@ -166,8 +166,9 @@ def downloadDailyData(ts_code:str, start:str, end:str, to_database:bool=False) -
         if to_database:
             # 保存数据库
             collection = dbDaily[bar.symbol]
-            flt = {'datetime': bar.datetime}
-            collection.replace_one(flt, bar.__dict__, True)
+            for bar in bar_list:
+                flt = {'datetime': bar.datetime}
+                collection.replace_one(flt, bar.__dict__, True)
             msg = f'{ts_code}\t数据下载并保存数据库完成【{len(bar_list)}】\t{date_from} - {date_to}'
         else:
             msg = f'{ts_code}\t数据下载完成【{len(bar_list)}】\t{date_from} - {date_to}'
@@ -187,6 +188,7 @@ def generateVtBar(row, symbol):
     bar.close_price = row['close']
     bar.volume = row['vol']
     bar.open_interest = row['oi']
+    bar.exchange = bar.exchange.value
     return bar
 
 # 判断主力合约并存入数据库，指定单个日期
@@ -343,6 +345,6 @@ if __name__ == '__main__':
         print(msg)
     """
 
-    bar_list, msg = downloadDailyData(ts_code='RB2005.SHF', start='20191210', end='20191213')
+    bar_list, msg = downloadDailyData(ts_code='HC2005.SHF', start='', end='', to_database=True)
     print(msg)
 
