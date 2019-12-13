@@ -345,6 +345,29 @@ if __name__ == '__main__':
         print(msg)
     """
 
-    bar_list, msg = downloadDailyData(ts_code='HC2005.SHF', start='', end='', to_database=True)
+
+    """
+    # 下载Daily_Bar数据
+    bar_list, msg = downloadDailyData(ts_code='SM2001.ZCE', start='', end='')
     print(msg)
+    """
+
+    """
+    # 添加空的Daily_Bar数据到数据库
+    symbol = 'A0000'
+    the_datetime = datetime.strptime('2019-12-13', '%Y-%m-%d')
+    bar = BarData(gateway_name='', symbol=symbol, exchange='', datetime=the_datetime, endDatetime=None)
+    collection = dbDaily[bar.symbol]
+    collection.insert_one(bar.__dict__)
+    """
+
+    """
+    # 添加空的Dominant数据到数据库
+    underline = 'HC'
+    symbol = 'HC2005'
+    date = datetime.strptime('2019-12-13', '%Y-%m-%d')
+    collection = dbDominant[underline]
+    collection.insert_one({'symbol':symbol,
+                           'date':date})
+    """
 
