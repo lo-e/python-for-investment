@@ -41,7 +41,7 @@ client.server_info()
 dbDominant = client[DOMINANT_DB_NAME]
 dbDaily = client[DAILY_DB_NAME]
 
-token = 'e4e657ed6666c850935080e1ef31b4c5f4d8e2ca1eb717a2afe36d51'
+token = '51b19d10cd7d6370c19c4a12087b2eff8c5eaeb50058b84bd4c8117a'
 ts.set_token(token)
 pro = ts.pro_api()
 
@@ -143,12 +143,9 @@ def fetchSymbolList():
 # 下载日线数据
 # start = '20190101     end = '20191231'
 def downloadDailyData(ts_code:str, start:str, end:str, to_database:bool=False) -> (list, str):
+    symbol = ts_code
     temp = ts_code.split('.')
-    symbol = ''
-    if len(temp) == 2:
-        symbol = temp[0]
-    else:
-        exit(0)
+    symbol = temp[0]
 
     df = pro.fut_daily(ts_code=ts_code, start_date=start, end_date=end).sort_values(by="trade_date", ascending=True)
     bar_list = []
@@ -173,7 +170,7 @@ def downloadDailyData(ts_code:str, start:str, end:str, to_database:bool=False) -
         else:
             msg = f'{ts_code}\t数据下载完成【{len(bar_list)}】\t{date_from} - {date_to}'
     else:
-        msg = f'{ts_code}\t数据下载空！！'
+        msg = f'{ts_code}\t数据下载空！！\t{start} - {end}'
 
     return bar_list, msg
 
@@ -314,41 +311,67 @@ def trasform_tscode(symbol:str):
     return ts_code
 
 if __name__ == '__main__':
-    """
+    underlying_list = ['RB', 'HC', 'SM', 'J', 'ZC', 'TA']
+    days = 2
+    today = datetime.strptime(datetime.now().strftime('%Y%m%d'), '%Y%m%d')
+    #"""
     # 获取主力合约代码并存入数据库
-    underline_list = ['RB', 'HC', 'SM', 'J', 'ZC', 'TA']
-    for target_symbol in underline_list:
-        from_date = datetime.strptime('2019-12-12', '%Y-%m-%d')
+    print('====== 获取主力合约代码并存入数据库 ======')
+    from_date = today - timedelta(days=days)
+    #from_date = datetime.strptime('2019-12-12', '%Y-%m-%d')
+    for target_symbol in underlying_list:
         get_and_save_dominant_symbol_from(symbol=target_symbol, from_date=from_date)
         print('\n')
-    """
+    #"""
 
-    """
-    # 查询数据库
-    underlying_symbol = 'RB'
-    today = datetime.now()
-    start = (today - timedelta(1)).strftime('%Y%m%d')
-    end = today.strftime('%Y%m%d')
+    #"""
+    # 下载最近两个主力合约的日线数据
+    print('====== 下载最近两个主力合约的日线数据 ======')
+    for underlying_symbol in underlying_list:
+        # 数据库查询最近两个主力合约
+        collection = dbDominant[underlying_symbol]
+        cursor = collection.find().sort('date', direction=DESCENDING)
+        symbol_list = []
+        for dic in cursor:
+            symbol = dic['symbol']
+            symbol_list.append(symbol)
+            if len(symbol_list) >= 2:
+                break
 
-    collection = dbDominant[underlying_symbol]
-    cursor = collection.find().sort('date', direction=DESCENDING)
-    symbol_list = []
-    for dic in cursor:
-        symbol = dic['symbol']
-        symbol_list.append(symbol)
-        if len(symbol_list) >= 2:
-            break
+        # 下载指定天数的日线数据
+        start = (today - timedelta(days=days)).strftime('%Y%m%d')
+        end = today.strftime('%Y%m%d')
+        for symbol in symbol_list:
+            ts_code = trasform_tscode(symbol=symbol)
+            bar_list, msg = downloadDailyData(ts_code=ts_code, start=start, end=end)
+            print(msg)
+        print('\n')
+    #"""
 
-    for symbol in symbol_list:
-        ts_code = trasform_tscode(symbol=symbol)
-        bar_list, msg = downloadDailyData(ts_code=ts_code, start=start, end=end)
-        print(msg)
-    """
+    #"""
+    # 添加空的指数日线数据到数据库【RB99】
+    print('====== 添加空的指数日线数据到数据库 ======')
+    target_date = today - timedelta(days=days + 1)
+    target_date = fetchNextTradeDate(exchange='SHFE', from_date=target_date)
+    add_date_list = []
+    while target_date and target_date <= today:
+        add_date_list.append(target_date.strftime('%Y-%m-%d'))
+        for underlying_symbol in underlying_list:
+            symbol = underlying_symbol + '99'
+            bar = BarData(gateway_name='', symbol=symbol, exchange='', datetime=target_date, endDatetime=None)
+            collection = dbDaily[bar.symbol]
+            collection.update_many({'datetime':target_date}, {'$set': bar.__dict__}, upsert=True)
+        target_date = fetchNextTradeDate(exchange='SHFE', from_date=target_date)
 
+    msg = ''
+    for date_str in add_date_list:
+        msg += date_str + '\t'
+    print(f'【{msg}】')
+    #"""
 
     """
     # 下载Daily_Bar数据
-    bar_list, msg = downloadDailyData(ts_code='SM2001.ZCE', start='', end='')
+    bar_list, msg = downloadDailyData(ts_code='RBL.SHF', start='', end='')
     print(msg)
     """
 
