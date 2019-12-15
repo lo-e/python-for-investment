@@ -164,8 +164,7 @@ def downloadDailyData(ts_code:str, start:str, end:str, to_database:bool=False) -
             # 保存数据库
             collection = dbDaily[bar.symbol]
             for bar in bar_list:
-                flt = {'datetime': bar.datetime}
-                collection.replace_one(flt, bar.__dict__, True)
+                collection.update_many({'datetime': bar.datetime}, {'$set': bar.__dict__}, upsert=True)
             msg = f'{ts_code}\t数据下载并保存数据库完成【{len(bar_list)}】\t{date_from} - {date_to}'
         else:
             msg = f'{ts_code}\t数据下载完成【{len(bar_list)}】\t{date_from} - {date_to}'
@@ -269,9 +268,9 @@ def get_and_save_dominant_symbol(symbol:str, target_date:datetime) -> (str, str)
         # 出现新主力，保存数据库
         next_trade_date = fetchNextTradeDate(exchange=new_dominant_symbol_data.exchange, from_date=target_date)
         if next_trade_date:
-            dominant_dict = {'date': target_date + timedelta(days=1),
+            dominant_dict = {'date': next_trade_date,
                              'symbol': new_dominant_bar.symbol}
-            collection.insert_one(dominant_dict)
+            collection.update_many({'date': next_trade_date}, {'$set': dominant_dict}, upsert=True)
             return (new_dominant_bar.symbol, f'{new_dominant_bar.symbol} -> {target_date}')
         else:
             return ('', '获取下一个交易日出错，检查代码！！')
@@ -314,6 +313,7 @@ if __name__ == '__main__':
     underlying_list = ['RB', 'HC', 'SM', 'J', 'ZC', 'TA']
     days = 2
     today = datetime.strptime(datetime.now().strftime('%Y%m%d'), '%Y%m%d')
+
     #"""
     # 获取主力合约代码并存入数据库
     print('====== 获取主力合约代码并存入数据库 ======')
@@ -327,6 +327,7 @@ if __name__ == '__main__':
     #"""
     # 下载最近两个主力合约的日线数据
     print('====== 下载最近两个主力合约的日线数据 ======')
+    downloaded_bar_datetime_list = []
     for underlying_symbol in underlying_list:
         # 数据库查询最近两个主力合约
         collection = dbDominant[underlying_symbol]
@@ -344,24 +345,24 @@ if __name__ == '__main__':
         for symbol in symbol_list:
             ts_code = trasform_tscode(symbol=symbol)
             bar_list, msg = downloadDailyData(ts_code=ts_code, start=start, end=end)
+            for downloaded_bar in bar_list:
+                if downloaded_bar.datetime not in downloaded_bar_datetime_list:
+                    downloaded_bar_datetime_list.append(downloaded_bar.datetime)
             print(msg)
         print('\n')
     #"""
 
     #"""
-    # 添加空的指数日线数据到数据库【RB99】
-    print('====== 添加空的指数日线数据到数据库 ======')
-    target_date = today - timedelta(days=days + 1)
-    target_date = fetchNextTradeDate(exchange='SHFE', from_date=target_date)
+    # 添加指数日线数据到数据库【RB99】
+    print('====== 添加指数日线数据到数据库 ======')
     add_date_list = []
-    while target_date and target_date <= today:
-        add_date_list.append(target_date.strftime('%Y-%m-%d'))
+    for downloaded_datetime in downloaded_bar_datetime_list:
         for underlying_symbol in underlying_list:
             symbol = underlying_symbol + '99'
-            bar = BarData(gateway_name='', symbol=symbol, exchange='', datetime=target_date, endDatetime=None)
+            bar = BarData(gateway_name='', symbol=symbol, exchange='', datetime=downloaded_datetime, endDatetime=None)
             collection = dbDaily[bar.symbol]
-            collection.update_many({'datetime':target_date}, {'$set': bar.__dict__}, upsert=True)
-        target_date = fetchNextTradeDate(exchange='SHFE', from_date=target_date)
+            collection.update_many({'datetime':bar.datetime}, {'$set': bar.__dict__}, upsert=True)
+        add_date_list.append(downloaded_datetime.strftime('%Y-%m-%d'))
 
     msg = ''
     for date_str in add_date_list:
