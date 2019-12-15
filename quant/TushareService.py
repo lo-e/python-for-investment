@@ -309,6 +309,9 @@ def trasform_tscode(symbol:str):
         ts_code = ts_code + f'.{SYMBOL_EXCHANGE_MAP[startSymbol]}'
     return ts_code
 
+def standard_daily_datetime(target_datetime:datetime):
+    return datetime.strptime(target_datetime.strftime('%Y%m%d'), '%Y%m%d')
+
 if __name__ == '__main__':
     underlying_list = ['RB', 'HC', 'SM', 'J', 'ZC', 'TA']
     days = 2
