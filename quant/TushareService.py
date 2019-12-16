@@ -198,7 +198,7 @@ def get_and_save_dominant_symbol(symbol:str, target_date:datetime) -> (str, str)
         if symbol_data.list_date and symbol_data.delist_date:
             start_trade_date = datetime.strptime(symbol_data.list_date, '%Y%m%d')
             last_trade_date = datetime.strptime(symbol_data.delist_date, '%Y%m%d')
-            if symbol in symbol_data.symbol and start_trade_date <= target_date and last_trade_date >= target_date:
+            if symbol == symbol_data.fut_code and start_trade_date <= target_date and last_trade_date >= target_date:
                 target_symbol_data_list.append(symbol_data)
 
     # 数据库获取最新主力合约代码
@@ -289,7 +289,7 @@ def get_and_save_dominant_symbol_from(symbol:str, from_date:datetime):
             new_dominant, msg = get_and_save_dominant_symbol(symbol=symbol, target_date=target_date)
             if new_dominant:
                 # 有新的主力产生
-                print(f'{msg}\t新主力\n')
+                print(f'{msg}\t新主力')
             else:
                 # 没有新主力产生
                 print(msg)
@@ -314,7 +314,7 @@ def standard_daily_datetime(target_datetime:datetime):
 
 if __name__ == '__main__':
     underlying_list = ['RB', 'HC', 'SM', 'J', 'ZC', 'TA']
-    days = 2
+    days = 3
     today = datetime.strptime(datetime.now().strftime('%Y%m%d'), '%Y%m%d')
 
     #"""
@@ -347,7 +347,7 @@ if __name__ == '__main__':
         end = today.strftime('%Y%m%d')
         for symbol in symbol_list:
             ts_code = trasform_tscode(symbol=symbol)
-            bar_list, msg = downloadDailyData(ts_code=ts_code, start=start, end=end)
+            bar_list, msg = downloadDailyData(ts_code=ts_code, start=start, end=end, to_database=True)
             for downloaded_bar in bar_list:
                 if downloaded_bar.datetime not in downloaded_bar_datetime_list:
                     downloaded_bar_datetime_list.append(downloaded_bar.datetime)
@@ -369,7 +369,10 @@ if __name__ == '__main__':
 
     msg = ''
     for date_str in add_date_list:
-        msg += date_str + '\t'
+        if msg:
+            msg += '\t' + date_str
+        else:
+            msg += date_str
     print(f'【{msg}】')
     #"""
 
