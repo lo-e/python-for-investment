@@ -232,7 +232,7 @@ def get_bar_data(coin:str, curr:str, limit:int, exchange:str, duration:str, toDa
 if __name__ == '__main__':
     # 下载日线数据
     #"""
-    toDatetime = '2019-12-31 00:00:00'
+    toDatetime = '2020-12-31 00:00:00'
     toDatetime = ''
     symbols = ['BTC', 'ETH', 'EOS', 'LTC', 'XRP']
     exchanges = ['OKEX', 'Poloniex']
