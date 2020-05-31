@@ -3,7 +3,7 @@
 from pymongo import MongoClient, ASCENDING, DESCENDING
 from vnpy.app.cta_strategy.base import TICK_DB_NAME, MINUTE_DB_NAME, DAILY_DB_NAME, MinuteDataBaseName, HourDataBaseName
 from datetime import datetime
-from vnpy.trader.object import BarData, TickData
+from vnpy.trader.object import TickData
 
 def test_tick():
     client = MongoClient('localhost', 27017, serverSelectionTimeoutMS=600)  # Mongo连接
