@@ -51,9 +51,6 @@ def test_daily():
     client = MongoClient('localhost', 27017)
     db = client[DAILY_DB_NAME]
     symbol_list = ['BTCUSD.BYBIT', 'ETHUSD.BYBIT']
-    # symbol_list = ['BTC.USDT.OKEX', 'ETH.USDT.OKEX', 'EOS.USDT.OKEX']
-    # symbol_list = ['OKEX/BTC.USDT', 'OKEX/ETH.USDT', 'OKEX/EOS.USDT']
-    # symbol_list = ['Poloniex/BTC.USDT', 'Poloniex/ETH.USDT', 'Poloniex/EOS.USDT']
     for symbol in symbol_list:
         collection = db[symbol]
         start = datetime.strptime('2019-11-27 00:00:00', '%Y-%m-%d %H:%M:%S')
