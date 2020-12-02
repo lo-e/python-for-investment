@@ -50,7 +50,11 @@ def test_minute():
 def test_daily():
     client = MongoClient('localhost', 27017)
     db = client[DAILY_DB_NAME]
-    symbol_list = ['BTCUSD.BYBIT', 'ETHUSD.BYBIT']
+    mode = input('选择模式【反向：1  正向：2】')
+    if mode == '1':
+        symbol_list = ['BTCUSD.BYBIT', 'ETHUSD.BYBIT']
+    else:
+        symbol_list = ['BTCUSDT.BYBIT', 'ETHUSDT.BYBIT']
     for symbol in symbol_list:
         collection = db[symbol]
         start = datetime.strptime('2019-11-27 00:00:00', '%Y-%m-%d %H:%M:%S')
