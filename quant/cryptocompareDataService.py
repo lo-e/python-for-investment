@@ -204,6 +204,8 @@ def get_bar_data(coin:str, curr:str, limit:int, exchange:str, duration:str, toDa
                 nextHour = 0
 
         dic.pop('time')
+        dic.pop('conversionType')
+        dic.pop('conversionSymbol')
         dic['datetime'] = datetime_str
         dic['symbol'] = contract
         result_list.append(dic)
