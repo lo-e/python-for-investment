@@ -72,7 +72,7 @@ def test_daily():
             close_price = dic['close_price']
             print(f'{symbol}\t{the_datetime}\t{open_price}\t{high_price}\t{low_price}\t{close_price}')
             count += 1
-            if count >= 6:
+            if count >= 8:
                 print('\n')
                 break
 
